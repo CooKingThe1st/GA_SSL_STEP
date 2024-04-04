@@ -1,0 +1,25 @@
+#VRML_SIM R2023b utf8
+# Show which is the current manually controlled Robot
+
+
+PROTO Indicator [
+]
+{
+    DEF INDICATOR Pose {
+      translation 0 0 0.14
+      rotation 1 0 0 3.14159
+      children [
+        DEF COVER Shape {
+          appearance PBRAppearance {
+            baseColor 0.768627 0.627451 0
+            roughness 1
+            metalness 0
+          }
+          geometry Cylinder {
+            height 0.006
+            radius 0.19
+          }
+        }
+      ]
+    }
+}
