@@ -706,7 +706,7 @@ int main(int argc, char **argv) {
 
     // config_dynamic_pod();
 
-    cout << "               ROBOT " << robot_encrypted_id << " has velo \n";
+    // cerr << "               ROBOT " << robot_encrypted_id << " has velo \n";
     finalize_speed();
     base_accelerate();
     // cout << "       DONE CYCLE " << robot_encrypted_id << '\n';

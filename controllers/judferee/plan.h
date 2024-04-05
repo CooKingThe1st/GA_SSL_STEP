@@ -52,12 +52,6 @@ double THRESHOLD_SHOOT_RISK = 70;
 double THRESHOLD_SHOOT_REWARD = 20;
 double THRESHOLD_SHOOT_DIST = HIGH_BOUND_Y*0.6;
 
-struct Command_Pack {
-	int player_id;
-	int player_state;
-	double sub_param_0, sub_param_1;
-};
-
 
 #define FRICTION 0.2
 #define _fric_ (32/(1000*FRICTION))

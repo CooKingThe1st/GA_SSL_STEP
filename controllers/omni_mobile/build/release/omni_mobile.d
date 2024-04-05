@@ -12,8 +12,9 @@ build/release/omni_mobile.o: omni_mobile.cpp \
  C:\Program\ Files\Webots/include/controller/c/webots/receiver.h \
  C:\Program\ Files\Webots/include/controller/c/webots/gps.h \
  C:\Program\ Files\Webots/include/controller/c/webots/led.h skills.h \
- navigate.h C:\Program\ Files\Webots/include/controller/c/webots/types.h \
- geometry.h RRT_simple.h \
+ ..\target_parameter.h navigate.h \
+ C:\Program\ Files\Webots/include/controller/c/webots/types.h geometry.h \
+ RRT_simple.h \
  C:\Program\ Files\Webots/include/controller/c/webots/supervisor.h \
  C:\Program\ Files\Webots/include/controller/c/webots/contact_point.h \
  update_graphic.h

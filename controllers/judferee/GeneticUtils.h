@@ -466,32 +466,22 @@ struct Town{
 
 Genome background_color;
 int eval_count = 0;
-double MAX_BOUND_VALUE = 1000000;
+double MAX_BOUND_VALUE = 1000;
 
-double fitness_function(Genome gene){
-	eval_count += 1;
-	return MAX_BOUND_VALUE*3 - (gene - background_color);
-}
+double fitness_function(Genome gene);
 
-
-// void GA_init(int given_size, vector<double> l_b, vector<double> u_b){
-// 	oneshot = Village(given_size, l_b, u_b);
+// double fitness_function(Genome gene){
+// 	eval_count += 1;
+// 	return MAX_BOUND_VALUE*gene.adn.size() - (gene - background_color);
 // }
 
-// void GA_check_terminate(){
-
-// }
-
-
-void RGB_test(int num_village, int num_gen_run, int num_era){
+void GENOME_test(int num_village, int num_gen_run, int num_era){
 	srand(time(0));
-	vector <double> color_ub{MAX_BOUND_VALUE, MAX_BOUND_VALUE, MAX_BOUND_VALUE};
-	vector <double> color_lb{0, 0, 0};
-
-	background_color = Genome(color_lb, color_ub);
+	for (int i = 0; i < 10; i++)
+		background_color = Genome(simple_move2ball_param_lb, simple_move2ball_param_ub);
 	// background_color = Genome(std::vector<double>{125, 125, 125});
 		std::cout << "BACK COLOR " << background_color << '\n';
-	Town oneshot(num_village, GA_popu_size, color_lb, color_ub);
+	Town oneshot(num_village, GA_popu_size, simple_move2ball_param_lb, simple_move2ball_param_ub);
 
 	while (num_era > 0){
 		num_era--;
@@ -505,7 +495,34 @@ void RGB_test(int num_village, int num_gen_run, int num_era){
 		cout << " PACK LEADER " << oneshot.village[0].cell[0].second << '\n';
 		oneshot.end_of_an_era();
 	}
+
 	cout << "EVAL COUNT " << eval_count << '\n';
 }
+
+// void RGB_test(int num_village, int num_gen_run, int num_era){
+// 	srand(time(0));
+// 	vector <double> color_ub{MAX_BOUND_VALUE, MAX_BOUND_VALUE, MAX_BOUND_VALUE};
+// 	vector <double> color_lb{0, 0, 0};
+
+// 	background_color = Genome(color_lb, color_ub);
+// 	// background_color = Genome(std::vector<double>{125, 125, 125});
+// 		std::cout << "BACK COLOR " << background_color << '\n';
+// 	Town oneshot(num_village, GA_popu_size, color_lb, color_ub);
+
+// 	while (num_era > 0){
+// 		num_era--;
+// 		for (int i = 0; i < num_gen_run; i++){
+// 			if (oneshot.terminate_ok()) break;
+// 			// cout << " COUNTER " << oneshot.diversity_counter + oneshot.fitness_counter  << '\n';
+// 			// if (oneshot.diversity_counter + oneshot.fitness_counter > 0) std::cout << "Gen " << oneshot.num_generation << " has best " << oneshot.town_fitness_best_gen() << " with Div " << oneshot.town_diversity_get() << '\n';
+// 			oneshot.town_gen();
+// 		}
+// 		cout << " NEW ERA " <<  oneshot.num_generation << " has best " << oneshot.town_fitness_best_gen() << " with Div " << oneshot.town_diversity_get() << '\n';
+// 		cout << " PACK LEADER " << oneshot.village[0].cell[0].second << '\n';
+// 		oneshot.end_of_an_era();
+// 	}
+
+// 	cout << "EVAL COUNT " << eval_count << '\n';
+// }
 
 #endif 

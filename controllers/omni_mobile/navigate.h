@@ -153,8 +153,10 @@ void base_apply_speeds(double vx, double vy, double omega) {
   omega = F_angle(omega) * DISTANCE_WHEEL_TO_ROBOT_CENTRE / WHEEL_RADIUS;
   // omega = omega * DISTANCE_WHEEL_TO_ROBOT_CENTRE * K_angle/ WHEEL_RADIUS;
 
+  cout.setstate(std::ios::failbit) ;
   cout << "               APPLIED VELO " << vx << ' ' << vy << ' ' << omega << '\n';
-
+  cout.clear();
+  
   if (fabs(vx - old_vx) > fabs(0.3*old_vx)) vx =  old_vx + (vx - old_vx) * v_smoothnees;
   old_vx = vx;
   if (fabs(vy - old_vy) > fabs(0.3*old_vy)) vy =  old_vy + (vy - old_vy) * v_smoothnees;

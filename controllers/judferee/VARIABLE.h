@@ -16,6 +16,7 @@
 bool MANUAL_MODE = 1;
 bool CHRONO_MODE = 0;
 bool RANDOM_MODE = 0;
+int SPECIAL_INPUT_DEBUG = 0;
 
 // UI ARG
 
@@ -77,6 +78,11 @@ bool missing_player[ROBOTS] = {0};
 
 // PLAYER COMMAND
 
+struct Command_Pack {
+	int player_id;
+	int player_state;
+	double sub_param_0, sub_param_1;
+};
     // SOCCER VARIABLE
 int player_state[ROBOTS];
 double player_param_main[ROBOTS] = {-1000,-1000,-1000,-1000, -1000,-1000,-1000,-1000, -1000,-1000,-1000,-1000, -1000, -1000};
@@ -95,6 +101,11 @@ int manual_player = -1;
 
 bool pole_visibility[3] = {0, 0, 0};
 WbNodeRef pole_ref[3];
+
+
+
+// function - definition
+void restart_all();
 
 
 #endif

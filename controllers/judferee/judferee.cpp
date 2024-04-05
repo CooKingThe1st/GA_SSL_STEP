@@ -19,6 +19,8 @@
 #include "chrono.h"
 #include "keyboard_event.h"
 
+#include "GeneticUtils.h"
+#include "scripted_command.h"
 
 #define INFO_MODE 0
 #define DECENTRALIZED 1
@@ -31,7 +33,6 @@
 #define HANI_CHECK_MODE 1
 #define RANDOM_FILTER 0
 
-#define SPECIAL_INPUT_DEBUG 0
 
 #define TEAM_A "SPN"
 #define TEAM_B "NON"
@@ -244,9 +245,7 @@ void command_decen(unsigned int time_step_now){
       try{
 
         if (score[0] + score[1] > 0){
-          player_state[player] = 0;
-          player_param_main[player] = -1000;
-          player_param_sub[player] = -1000;
+          player_state[player] = 0; player_param_main[player] = -1000; player_param_sub[player] = -1000;
           continue;
         }
 
@@ -255,11 +254,12 @@ void command_decen(unsigned int time_step_now){
 
         if (IntPack.vio_type == -1 || player != IntPack.executor){
 
+          double t_ball_position[2] = {ball_position[0], ball_position[1]}; 
           if (IntPack.vio_type != -1) 
-            ball_position[0] = IntPack.VioPos.first,
-            ball_position[1] = IntPack.VioPos.second;
+            t_ball_position[0] = IntPack.VioPos.first,
+            t_ball_position[1] = IntPack.VioPos.second;
 
-          get_command = normal_gameplay(time_step_now, CURRENT_BRAIN_LEVEL, missing_player, player_position, player_ball, ball_position, player, Point{ball_moving_direction[0], ball_moving_direction[1]}, ball_velo, IntPack);
+          get_command = normal_gameplay(time_step_now, CURRENT_BRAIN_LEVEL, missing_player, player_position, player_ball, t_ball_position, player, Point{ball_moving_direction[0], ball_moving_direction[1]}, ball_velo, IntPack);
 
           if (IntPack.vio_type != -1)
             get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
@@ -282,33 +282,13 @@ void command_decen(unsigned int time_step_now){
 
 
         if (SPECIAL_INPUT_DEBUG){
-          if (time_step_now < 20){
-            if (player == 0) get_command = Command_Pack{-1, 0, -1000, -1000};
-            if (player == 11) get_command = Command_Pack{-1, 0, -1000, -1000};
-            if (player == 8) get_command = Command_Pack{8,  8, -1000, -1000};
+
+          if (GYM_TERMINATED_FLAG(time_step_now, SPECIAL_INPUT_DEBUG)) {
+            update_fitness_value();
+            restart_all();
           }
-          else if (player_ball[8] == 1){
-            if (player == 0) get_command = Command_Pack{-1, 0, -1000, -1000};
-            if (player == 11) get_command = Command_Pack{-1, 0, -1000, -1000};
-
-            if (player == 8) get_command = Command_Pack{8,  9, 8, 0};
-            // if (player == 8) get_command = Command_Pack{8,  9, grid_x[rid],grid_y[rid]};
-          }
-          else if (player_ball[11] != 1) {
-            if (player == 0) get_command = Command_Pack{4, 0, -1000, -1000};
-            // if (player == 11) get_command = Command_Pack{11, 0, -1000, -1000};
-
-            if (player == 11) cout << "MAIN CONCERN " << get_command.player_state << ' ' << get_command.sub_param_0 << ' ' << get_command.sub_param_1 << " here at rob 11 \n"; 
-            // if (player == 11 && get_command.player_state != 68) 
-            // {
-            // }
-
-
-            // if (player == 11 && get_command.player_state != 68) get_command = Command_Pack{11, 8, -1000, -1000};
-
-            if (player == 8) get_command = Command_Pack{8, 0, -1000, -1000};
-          }
-          else restart_all();
+          else 
+            get_command = GYM_SCRIPTED_COMMAND(time_step_now, player, SPECIAL_INPUT_DEBUG);
         }
 
         player_state[player] = get_command.player_state;
@@ -643,6 +623,13 @@ void process_sysvar(int argc, char **argv){
   if (found_level != std::string::npos)
     // std::cout << "first 'AI' found at: " << temp.substr(found_level) << '\n';
     MANUAL_MODE =  ((temp.back() - '0') > 0) ? 1 : 0;  
+
+  temp = string(argv[4]);
+  found_level = temp.find("SCRIPTED"); // maximum 9 scripts
+  if (found_level != std::string::npos)
+    // std::cout << "first 'AI' found at: " << temp.substr(found_level) << '\n';
+    SPECIAL_INPUT_DEBUG =  (temp.back() - '0');
+
 }
 
 int main(int argc, char **argv) {
@@ -684,6 +671,10 @@ int main(int argc, char **argv) {
 
   if (MANUAL_MODE) init_keyboard();
   if (CHRONO_MODE) init_chrono();
+
+
+  // RGB_test(stoi(argv[1]), stoi(argv[2]), stoi(argv[3]));
+
 
   while (wb_robot_step(TIME_STEP) != -1) {
 
