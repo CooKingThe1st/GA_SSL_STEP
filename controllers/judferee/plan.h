@@ -1169,7 +1169,7 @@ Command_Pack switch_to_attack(unsigned int time_step_now,  bool *missing, double
 		else
 		if (time_step_now > attack_pack.time_step){
 
-			clear_file("temp");
+			clear_file("temp.txt");
 
 			bool boundary_near = (time_step_now == attack_pack.time_step + 1);
 			if (IPACK.vio_type != -1) boundary_near = 0;
@@ -1253,7 +1253,7 @@ Command_Pack switch_to_attack(unsigned int time_step_now,  bool *missing, double
 					string reward = std::to_string(gid) + "   " + std::to_string(ball_traj_reward) + "   " + std::to_string(receiver_offball_reward) +\
 					 "   " + std::to_string(receiver_traj_reward) + "   " + std::to_string(receiver_attack_reward) + "   " + std::to_string(total_attack_point) + "\n";
 					 cout << "HERE " << reward;
-					// log_to_file("temp", reward);
+					// log_to_file("temp.txt", reward);
 
 					COUNTER_LOG += 1;
 				}
@@ -1299,14 +1299,14 @@ Command_Pack switch_to_attack(unsigned int time_step_now,  bool *missing, double
 			}
 
 
-			// if (PAPER_ATTAK_MODE) log_to_file("reward", "end\n\n\n");
+			// if (PAPER_ATTAK_MODE) log_to_file("reward.txt", "end\n\n\n");
 
 			for (int rid = 0; rid < ROBOTS; rid++){
 				if (missing[rid]) continue;
 				string position = std::to_string(rid) + " " + std::to_string(player_pos[rid][0]) + " " + std::to_string(player_pos[rid][1]) + "\n";
-				if (PAPER_ATTAK_MODE) log_to_file("position", position);
+				if (PAPER_ATTAK_MODE) log_to_file("position.txt", position);
 			}
-			// if (PAPER_ATTAK_MODE) log_to_file("position", "end\n\n\n");
+			// if (PAPER_ATTAK_MODE) log_to_file("position.txt", "end\n\n\n");
 
 
 			attack_pack = Attack_Pack{time_step_now, best_pass_reward, best_ball_tree, best_field_point, best_rec};
@@ -1494,7 +1494,7 @@ Command_Pack guess_ball_strategy( bool *missing, double player_pos[][3], int *pl
 // FUCK HERE, as the goal keeper did not fall into the switch_def but here
 			// cout << "UPDATE\n ";
 			string guess_I = (this_id < 7 ? "1 " : "0 ") + std::to_string(best_IPOINT.first) + " " + std::to_string(best_IPOINT.second) + " PRE " + std::to_string(predicted_ball.first) + " " + std::to_string(predicted_ball.second) + "\n";
-			// if (PAPER_ATTAK_MODE) log_to_file("temp_p", guess_I);
+			// if (PAPER_ATTAK_MODE) log_to_file("temp_p.txt", guess_I);
 			if (GUESS_BALL_UI) {
 
 				update_pole_target(0, best_IPOINT);

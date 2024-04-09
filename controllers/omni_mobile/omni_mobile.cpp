@@ -18,6 +18,7 @@
 #include "update_graphic.h"
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -302,6 +303,32 @@ void init_sensor_actuator()
 
 
 //---------------INFO_UPDATE_CYCLE
+
+
+vector<double> read_file(string file_name){
+    std::ifstream ifile(file_name, std::ios::in);
+    std::vector<double> return_double;
+
+    //check to see that the file was opened correctly:
+    if (!ifile.is_open()) {
+        std::cerr << "There was a problem opening the " +file_name + "file!\n";
+        exit(1);//exit or do additional error checking
+    }
+
+    double num = 0.0;
+    //keep storing values from the text file so long as data exists:
+    while (ifile >> num) {
+        return_double.push_back(num);
+    }
+    return return_double;
+}
+
+void update_ga_param(){
+  std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
+  for (auto i = 0; i < (int)receive_signal.size(); i++)
+    simple_move2ball_param[i] = receive_signal[i];
+  // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
+}
 
 void update_sensor_value()
 {
@@ -686,6 +713,8 @@ int main(int argc, char **argv) {
 
     update_sensor_value();
     update_wireless_receiver();
+
+    update_ga_param();
 
     get_player_ball_position();
 

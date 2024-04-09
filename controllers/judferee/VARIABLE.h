@@ -18,6 +18,9 @@ bool CHRONO_MODE = 0;
 bool RANDOM_MODE = 0;
 int SPECIAL_INPUT_DEBUG = 0;
 
+// GA ARG
+int GA_SIGNAL_TEST = 0;
+
 // UI ARG
 
 

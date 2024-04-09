@@ -13,13 +13,23 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <random>
+#include <algorithm>
 
 #include "interupt.h"
 #include "plan.h"
 #include "chrono.h"
 #include "keyboard_event.h"
 
-#include "GeneticUtils.h"
+#ifdef __linux__ 
+  #include "../GA_thread/target_parameter.h"
+#elif _WIN32
+  #include "..\\GA_thread\target_parameter.h"
+#else
+
+#endif
+
 #include "scripted_command.h"
 
 #define INFO_MODE 0
@@ -54,7 +64,7 @@ double match_time = TIME_FULL_MATCH;  // a match lasts for 3 minutes
 // referee sensor
 WbDeviceTag non_emitter, non_receiver, spn_emitter, spn_receiver;
 // judge sensor
-// WbDeviceTag inter_emitter, inter_receiver;
+// WbDeviceTag ga_emitter, ga_receiver;
 
 // player return value
 
@@ -85,15 +95,15 @@ void init_sensor_actuator()
 {
   spn_emitter = wb_robot_get_device("spn_emitter");
   non_emitter = wb_robot_get_device("non_emitter");
-  // inter_emitter = wb_robot_get_device("interupt_emitter");
+  // ga_emitter = wb_robot_get_device("ga_emitter");
 
   spn_receiver = wb_robot_get_device("spn_receiver");
   non_receiver = wb_robot_get_device("non_receiver");
-  // inter_receiver = wb_robot_get_device("interupt_receiver");
+  // ga_receiver = wb_robot_get_device("ga_receiver");
 
   wb_receiver_enable(spn_receiver, TIME_STEP);
   wb_receiver_enable(non_receiver, TIME_STEP);
-  // wb_receiver_enable(inter_receiver, TIME_STEP);
+  // wb_receiver_enable(ga_receiver, TIME_STEP);
 
   wb_keyboard_enable(TIME_STEP);
 
@@ -160,7 +170,7 @@ void update_robot_pose()
 void reset_receiver(){
   while (wb_receiver_get_queue_length(non_receiver) > 0) wb_receiver_next_packet(non_receiver);
   while (wb_receiver_get_queue_length(spn_receiver) > 0) wb_receiver_next_packet(spn_receiver);
-  // while (wb_receiver_get_queue_length(inter_receiver) > 0) wb_receiver_next_packet(inter_receiver);
+  // while (wb_receiver_get_queue_length(ga_receiver) > 0) wb_receiver_next_packet(ga_receiver);
 }
 
 void update_wireless_receiver()
@@ -197,18 +207,26 @@ void update_wireless_receiver()
       wb_receiver_next_packet(spn_receiver);
    }
 
+  // while (wb_receiver_get_queue_length(ga_receiver) > 0) {
+  //     const int *message = (int const*)wb_receiver_get_data(ga_receiver);
+
+  //     if (GA_SIGNAL_TEST != 1) GA_SIGNAL_TEST = (*message);
+
+  //     wb_receiver_next_packet(ga_receiver);
+  //  }
+
    // cout << "final check " << pass_attempt[0] << " " << pass_attempt[1] << '\n';
 
-  // while (wb_receiver_get_queue_length(inter_receiver) > 0) {
-  //     const int *message = (int const*)wb_receiver_get_data(inter_receiver);
-  //     // const int data_length = wb_receiver_get_data_size(inter_receiver) /sizeof(int);
+  // while (wb_receiver_get_queue_length(ga_receiver) > 0) {
+  //     const int *message = (int const*)wb_receiver_get_data(ga_receiver);
+  //     // const int data_length = wb_receiver_get_data_size(ga_receiver) /sizeof(int);
 
   //     int true_id = robot_decrypt(*message);
   //     if (WIRELESS_INTERUPT_MODE) 
   //         cout << "RECEIVED: robot_id " << *message << " name " << robot_name[true_id] << " interupt_state " <<  *(message+1) << '\n';   
   //     player_interupt_state[true_id] = *(message + 1);
 
-  //     wb_receiver_next_packet(inter_receiver);
+  //     wb_receiver_next_packet(ga_receiver);
   //  }
 }
 
@@ -236,6 +254,27 @@ void update_goal()
 // Point save_point_1, save_point_2;
 //------------------- coaching function-------------
 int rid = rand() % GRIDIFY_FIELD;
+
+void update_ga_signal(){
+  vector<double> receive_signal = read_file("..\\log\\GA_SIGNAL.txt");
+  GA_SIGNAL_TEST = int(receive_signal[0]);
+}
+
+void update_fitness_value(unsigned int time_step_now){
+  GA_SIGNAL_TEST = 0;
+    // cout << " DONE 1 cycle \n";
+  double fitness_return = 10000-wb_robot_get_time();
+
+  // transmit signal
+
+    string return_signal = std::to_string(1) + " " + std::to_string(fitness_return);
+    clear_file("..\\log\\GA_RETURN.txt");
+    log_to_file("..\\log\\GA_RETURN.txt", return_signal);
+
+  // int data_send[1] = {9};
+  // wb_emitter_send(ga_emitter, data_send, sizeof(int) * 1);
+}
+
 
 void command_decen(unsigned int time_step_now){
 
@@ -284,8 +323,9 @@ void command_decen(unsigned int time_step_now){
         if (SPECIAL_INPUT_DEBUG){
 
           if (GYM_TERMINATED_FLAG(time_step_now, SPECIAL_INPUT_DEBUG)) {
-            update_fitness_value();
+            update_fitness_value(time_step_now);
             restart_all();
+            return;
           }
           else 
             get_command = GYM_SCRIPTED_COMMAND(time_step_now, player, SPECIAL_INPUT_DEBUG);
@@ -529,6 +569,35 @@ void update_current_time()
     show_current_time(match_time);
 }
 
+void soft_restart_all()
+{
+  wb_supervisor_simulation_reset();
+  // for (int i = 0; i < ROBOTS; i++)
+  //   if (!missing_player[i]) wb_supervisor_node_restart_controller(player_def[i]);
+  // wb_supervisor_node_restart_controller(wb_supervisor_node_get_self());
+
+  // wb_supervisor_world_reload();
+
+  double ball_velocity[6] = {0, 0, 0, 0, 0, 0};
+  wb_supervisor_node_set_velocity(ball_node, ball_velocity);
+  wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(ball_node, "translation"), ball_initial_position);
+
+  for (i = 0; i < ROBOTS; i++) {
+    if (missing_player[i]) continue;
+    wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
+    wb_supervisor_field_set_sf_rotation(wb_supervisor_node_get_field(player_def[i], "rotation"), player_initial_rotation[i]);
+  
+    old_player_param_main[i] = -1;
+    old_player_state[i] = -1;
+    player_state[i] = 0;
+    player_param_main[i] = -1000, player_param_sub[i] = -1000; player_ball[i] = 0;
+  }
+  // non_last_ball = -1, spn_last_ball = -1;
+  // player_last_touch = -1, cached_player_last_touch = -1;
+
+  reset_receiver();
+}
+
 void restart_all()
 {
   string Header = std::string("TIME ") + get_file_timestamp() + " STEP " + std::to_string(time_step_counter) + "\n";
@@ -541,8 +610,8 @@ void restart_all()
 
   string EndRoll = "EndOfReport\n";
 
-  clear_file("reward");
-  clear_file("temp_p");
+  clear_file("reward.txt");
+  clear_file("temp_p.txt");
 
   write_to_file("FLOG_"+init_ball_side, Header + Possesion + PAttempt + SAttempt + Ball_AtkRate + Goal_R+EndRoll);
   wb_supervisor_simulation_reset();
@@ -586,18 +655,50 @@ void get_initial_pose()
 
 void little_reroll(){
   if (!RANDOM_MODE) return;
-  for (int i = 0; i < ROBOTS; i++){
-    if (missing_player[i]) continue;
 
-    if (RANDOM_FILTER && i != 11) continue;
+  if (!SPECIAL_INPUT_DEBUG){
 
-    srand(i+time(0));
-    int choice = rand()%15;
-    Point new_pose = bound_p(get_move_to_dir(Point{player_initial_position[i][0], player_initial_position[i][1]}, choice), 0.4);
-    player_initial_position[i][0] = new_pose.first;
-    player_initial_position[i][1] = new_pose.second;
-    wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
-  } 
+    for (int i = 0; i < ROBOTS; i++){
+      if (missing_player[i]) continue;
+
+      if (RANDOM_FILTER && i != 11) continue;
+
+      srand(i+time(0));
+      int choice = rand()%15;
+      Point new_pose = bound_p(get_move_to_dir(Point{player_initial_position[i][0], player_initial_position[i][1]}, choice), 0.4);
+      player_initial_position[i][0] = new_pose.first;
+      player_initial_position[i][1] = new_pose.second;
+      wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
+    }
+  }
+  else{
+
+      double fix_rad = read_file("..\\log\\GA_ENV.txt")[0];
+      fix_rad = read_file("..\\log\\GA_BASE_ENV.txt")[fix_rad];
+
+      for (int i = 0; i < ROBOTS; i++) if (!missing_player[i]){
+          // srand(i+time(0));
+        int STEP_NUM = 36;
+        double STEP_ANG = 360 / STEP_NUM;
+
+        std::random_device dev;
+        std::mt19937 rng(dev());
+        std::uniform_int_distribution<std::mt19937::result_type> dist36(0, 35); // distribution in range [1, 6]
+
+
+        int rand_choice = dist36(rng);
+        // Point new_pose = bound_p( Point{player_position[i][0] + fix_rad * cos(  i*STEP_ANG *  M_PI / 180.0 ),  player_position[i][1] + fix_rad * sin(  i*STEP_ANG *  M_PI / 180.0 )}, 0.4);
+
+        Point new_pose = bound_p( Point{0 + fix_rad * cos(  rand_choice*STEP_ANG *  M_PI / 180.0 ),  0 + fix_rad * sin(  rand_choice*STEP_ANG *  M_PI / 180.0 )}, 0.4);
+
+        player_initial_position[i][0] = new_pose.first;
+        player_initial_position[i][1] = new_pose.second;
+        wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
+
+        break;
+      }
+  }
+
 }
 
 void process_sysvar(int argc, char **argv){
@@ -621,7 +722,7 @@ void process_sysvar(int argc, char **argv){
   temp = string(argv[3]);
   found_level = temp.find("MANUAL");
   if (found_level != std::string::npos)
-    // std::cout << "first 'AI' found at: " << temp.substr(found_level) << '\n';
+   // std::cout << "first 'AI' found at: " << temp.substr(found_level) << '\n';
     MANUAL_MODE =  ((temp.back() - '0') > 0) ? 1 : 0;  
 
   temp = string(argv[4]);
@@ -631,6 +732,7 @@ void process_sysvar(int argc, char **argv){
     SPECIAL_INPUT_DEBUG =  (temp.back() - '0');
 
 }
+
 
 int main(int argc, char **argv) {
 
@@ -661,8 +763,8 @@ int main(int argc, char **argv) {
 
   STAT_UI();
 
-  clear_file("reward");
-  clear_file("temp_p");
+  clear_file("reward.txt");
+  clear_file("temp_p.txt");
 
 
   if (ball_position[0] > 0)
@@ -679,13 +781,32 @@ int main(int argc, char **argv) {
   while (wb_robot_step(TIME_STEP) != -1) {
 
       // if (ATTACK_DEBUG_MODE) cout << "       BALL_VELO NOW " << ball_velo << '\n';
-
-      time_step_counter += 1;
       update_robot_pose();
       update_wireless_receiver();
 
       update_ball_teamCon_Stat();
       update_ball_touch_euler();
+
+      
+      if (SPECIAL_INPUT_DEBUG){
+        update_ga_signal();
+      
+        if (GA_SIGNAL_TEST == 1){
+          // GA_SIGNAL_TEST = -1;
+          // restart_all();
+        }
+        else if (GA_SIGNAL_TEST == 0) {
+          time_step_counter = 0;
+          continue;
+        }
+      }
+      // else if (GA_SIGNAL_TEST == -2){
+      //   GA_SIGNAL_TEST = 0;
+
+      //   soft_restart_all();
+      // }
+
+      time_step_counter += 1;
 
       // cout << "DONE SENSOR \n";
 
@@ -733,6 +854,7 @@ int main(int argc, char **argv) {
       // cout << "DONE JUDGEFREE CYCLE \n";
        // cout << "1 \n";
       // cout << "2 \n";
+      // cout << "     GA SIGNAL  " <<  GA_SIGNAL_TEST << '\n';
 
   }
 

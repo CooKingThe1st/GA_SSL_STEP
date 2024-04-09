@@ -2,9 +2,9 @@
 #define SKILLS_H
 
 #ifdef __linux__ 
-  #include "../target_parameter.h"
+  #include "../GA_thread/target_parameter.h"
 #elif _WIN32
-  #include "..\target_parameter.h"
+  #include "..\GA_thread\target_parameter.h"
 #else
 
 #endif
@@ -157,6 +157,8 @@ bool should_use_predict(){
 Omni_Vector react_move_to_position(double  current_x, double current_y, double t_pos_x, double t_pos_y, \
 									double t_dir_x, double t_dir_y, bool special_offset = 0)
 {
+
+  // cout << "   CHECK  " << simple_move2ball_param[0] << ' ' << simple_move2ball_param[1] << "       CURRENT PARAM \n";
 
 	// assert(use_ball_pos*dir_to_ball == 0);
 
@@ -317,6 +319,9 @@ Omni_Vector plan_rrt(Dot q_f, Dot bx = default_bx, Dot by = default_by, int dir_
 	 //    		cout << i.first << ' ' << i.second << '\n';
 	 //    	cout << '\n';
 		// }
+
+    if (dir_to_ball == 1)
+    r_path[1] = q_org_f;
 
     if (dir_to_ball == 1)
 	    return react_move_to_position(q_s.first, q_s.second,  bound_x(r_path[1].first, bx.first, bx.second), bound_y(r_path[1].second, by.first, by.second), ball_position[0], ball_position[1]);

@@ -53,6 +53,8 @@ Command_Pack GYM_SCRIPTED_COMMAND(unsigned int time_step_now, int player_ask_id,
 }
 
 bool GYM_TERMINATED_FLAG(unsigned int time_step_now, int script_id){
+	if (wb_robot_get_time() > 10) return true;
+
 	vector<int> player_on_field;
 	for (int i = 0; i < ROBOTS; i++) if (!missing_player[i]) player_on_field.push_back(i);
 	return (player_ball[player_on_field[0]]);
