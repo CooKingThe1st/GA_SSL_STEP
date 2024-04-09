@@ -42,6 +42,8 @@
 #define SPEC_DEBUG_MODE (robot_encrypted_id == 503)
 #define EMITTER_INFO 0
 
+#define GA_UPDATE 0
+
 #define ACTION_DEBUG_MODE 0
 #define WIRELESS_DEBUG_MODE 0
 
@@ -325,8 +327,18 @@ vector<double> read_file(string file_name){
 
 void update_ga_param(){
   std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
+
+  // for (auto i = 0; i < (int)receive_signal.size(); i++)
+  //   simple_move2ball_param[i] = receive_signal[i];
+
+
   for (auto i = 0; i < (int)receive_signal.size(); i++)
-    simple_move2ball_param[i] = receive_signal[i];
+    if (i <= 4)
+      chase_param[i] = receive_signal[i];
+    else 
+      pass_param[i-5] = receive_signal[i];
+
+
   // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
 }
 
@@ -589,6 +601,7 @@ static void behavior_control(){
       // }
       case 9:
         field_shoot(param_main[this_id], param_sub[this_id]);
+              // shoot_ball();
         break;
       case 18:
         component_vector[0] = rotate_to_object(ball_node);
@@ -714,7 +727,7 @@ int main(int argc, char **argv) {
     update_sensor_value();
     update_wireless_receiver();
 
-    update_ga_param();
+    if (GA_UPDATE) update_ga_param();
 
     get_player_ball_position();
 

@@ -168,7 +168,7 @@ double fitness_function(Genome gene){
 
 
 void GA_RUN(int num_village, int num_gen_run, int num_era){
-	Town oneshot(num_village, GA_popu_size, simple_move2ball_param_lb, simple_move2ball_param_ub);
+	Town oneshot(num_village, GA_popu_size, target_lb, target_ub);
 
 	clear_file("..\\log\\GA_LOG.txt");
 
@@ -227,6 +227,12 @@ int main(int argc, char **argv){
 
 	const int temp = wb_robot_get_basic_time_step();
 	TIME_STEP = temp;
+
+	target_ub.insert(target_ub.end(), chase_param_ub.begin(), chase_param_ub.end());
+	target_ub.insert(target_ub.end(), pass_param_ub.begin(), pass_param_ub.end());
+
+	target_lb.insert(target_lb.end(), chase_param_lb.begin(), chase_param_lb.end());
+	target_lb.insert(target_lb.end(), pass_param_lb.begin(), pass_param_lb.end());
 
 	// ga_emitter = wb_robot_get_device("ga_emitter");
 	// ga_receiver = wb_robot_get_device("ga_receiver");

@@ -7347,7 +7347,7 @@ DEF NON_CB Robot {
   supervisor TRUE
 }
 DEF BALL Solid {
-  translation 3.05294 3.47483 -0.0401409
+  translation 2.09 3.48 -0.0401409
   rotation -0.7608255287009655 0.06637358153930532 0.6455532995427576 -1.9697225298394896
   children [
     Connector {
@@ -7448,7 +7448,7 @@ DEF JUDFEREE Robot {
   controller "judferee"
   controllerArgs [
     "AI_LEVEL_0"
-    "RAND_1"
+    "RAND_0"
     "MANUAL_0"
     "SCRIPTED_0"
   ]

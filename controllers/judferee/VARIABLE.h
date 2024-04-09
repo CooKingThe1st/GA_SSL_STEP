@@ -100,6 +100,20 @@ int manual_player = -1;
 // SETUP_UI VAR
 
 
+// REFEREE STAT CHECK
+
+
+double time_possession[2] = {1, 1};
+double ball_attack_time[2] = {0, 0}; // total time in opponent field
+double dead_ball_cached_time = 0;
+int pass_attempt[2] = {0, 0}; int pass_cached = 0;
+int self_pass[2] = {0, 0};
+int pass_success[2] = {0, 0};
+
+int shoot_attempt[2] = {0, 0};
+
+int euler_cur_touch = -1, euler_cached_touch = -1;
+
 // POLE VAR
 
 bool pole_visibility[3] = {0, 0, 0};

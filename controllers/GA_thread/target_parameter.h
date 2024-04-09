@@ -6,19 +6,27 @@
 using namespace std;
 
 							// include, K_0, K_1, K_2
-vector<double > chase_param {2, 1.2, 1.3}; // the current version
-vector<double > chase_param_ub{5, 5, 5};
-vector<double > chase_param_lb{0, 0, 0};
+vector<double > chase_param  {4.571229,1.157314,4.421715,1.490760,0.321791}; //{2, 1.2, 1.3, 3, 0.5}; // the current version
+
+vector<double > chase_param_ub{5, 5, 5, 10, 3};
+vector<double > chase_param_lb{0, 0, 0, 0, 0};
 
 							// inlcude, K_move, steady_velo_radius, steady_velo_function
-vector<double > simple_move2ball_param {12.952830 3.642449 4.137686 12.249567 0.637410 };//  {10, 3.9, 3.3, 20, 1.2}; // the current version
-
+vector<double > simple_move2ball_param   {10, 3.9, 3.3, 20, 1.2}; // the current version
+// {12.952830,3.642449,4.137686,12.249567,0.637410 };// 
 vector<double > simple_move2ball_param_lb{ 3, 2.5,   2,  1, 0.5};
 vector<double > simple_move2ball_param_ub{20,   5,   5, 20,   3};
 
-vector<double > pass_param;
+vector<double > pass_param {2.083760,1.375789,2.065974};// { 0.65, 1.35, 1.47};
+
+vector<double > pass_param_ub{0.3, 1, 1};
+vector<double > pass_param_lb{1, 1.5, 1.5};
+
 vector<double > shoot_param;
 
 
+
+
+vector<double> target_ub, target_lb;
 
 #endif 

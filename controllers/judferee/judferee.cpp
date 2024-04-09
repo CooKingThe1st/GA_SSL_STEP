@@ -260,7 +260,7 @@ void update_ga_signal(){
   GA_SIGNAL_TEST = int(receive_signal[0]);
 }
 
-void update_fitness_value(unsigned int time_step_now){
+void update_fitness_value(unsigned int time_step_now, int scripted_id){
   GA_SIGNAL_TEST = 0;
     // cout << " DONE 1 cycle \n";
   double fitness_return = 10000-wb_robot_get_time();
@@ -320,15 +320,15 @@ void command_decen(unsigned int time_step_now){
         assert(player == get_command.player_id);
 
 
-        if (SPECIAL_INPUT_DEBUG){
+        if (SPECIAL_INPUT_DEBUG > 0){
 
           if (GYM_TERMINATED_FLAG(time_step_now, SPECIAL_INPUT_DEBUG)) {
-            update_fitness_value(time_step_now);
+            update_fitness_value(time_step_now, SPECIAL_INPUT_DEBUG);
             restart_all();
             return;
           }
           else 
-            get_command = GYM_SCRIPTED_COMMAND(time_step_now, player, SPECIAL_INPUT_DEBUG);
+            get_command = GYM_SCRIPTED_COMMAND(time_step_now, player, get_command, SPECIAL_INPUT_DEBUG);
         }
 
         player_state[player] = get_command.player_state;
@@ -418,17 +418,6 @@ void transmit_coach()
 }
 
 //----------------------referee function
-
-double time_possession[2] = {1, 1};
-double ball_attack_time[2] = {0, 0}; // total time in opponent field
-double dead_ball_cached_time = 0;
-int pass_attempt[2] = {0, 0}; int pass_cached = 0;
-int self_pass[2] = {0, 0};
-int pass_success[2] = {0, 0};
-
-int shoot_attempt[2] = {0, 0};
-
-int euler_cur_touch = -1, euler_cached_touch = -1;
 
 void update_ball_touch_euler(){
 

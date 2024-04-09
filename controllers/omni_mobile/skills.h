@@ -86,11 +86,11 @@ void check_counter_springer(){
 #define FORCE2DISTANCE 0.7 //0.0926
 #define MAX_FORCE 10
 
-void on_springer(int on_timer, double distance_travel, double dir_shot_x, double dir_shot_y)  
+void on_springer(int on_timer, double distance_travel, double dir_shot_x, double dir_shot_y, double K0 = pass_param[0])
 { 
   springer_counter = on_timer;  
   // double applied_force = FORCE2DISTANCE*distance_travel+0.56; 
-  double applied_force = FORCE2DISTANCE*distance_travel+0.65; 
+  double applied_force = FORCE2DISTANCE*distance_travel+K0; 
 
 
   // applied_force = 0.9*distance_travel;
@@ -492,7 +492,7 @@ void get_ball(){
 #define V_MAX_ROB 1.2
 
 
-void chase_ball(double IP_x, double IP_y, double K_0 = chase_param[0],  double K_1 = chase_param[1],  double K_2 = chase_param[2] ){
+void chase_ball(double IP_x, double IP_y, double K_0 = chase_param[0],  double K_1 = chase_param[1],  double K_2 = chase_param[2], double K_3 = chase_param[3], double K_4 = chase_param[4]){
 	if (wb_connector_get_presence(magnetic_sensor) == 0){
 			double t_ball2IP = length_dist_vector(ball_position[0], ball_position[1],  IP_x, IP_y) / ball_velo;
 			double t_rob2IP  = length_dist_vector(gps_value[0], gps_value[1],  IP_x, IP_y) / V_MAX_ROB;
@@ -505,7 +505,7 @@ void chase_ball(double IP_x, double IP_y, double K_0 = chase_param[0],  double K
 				component_vector[2].ippai(3);
 			}
 			else {
-				move_to_ball(default_bx, default_by, exp(-current_dist_2ball/3)*K_0);
+				move_to_ball(default_bx, default_by, exp(-current_dist_2ball/K_3)*K_0);
 					double delta_ball_dir = length_vector(ball_moving_direction[0], ball_moving_direction[1]); 
 					// if ( delta_ball_dir > 0.5 && fabs( fabs(IP_x) - HIGH_BOUND_X) > 1 && fabs( fabs(IP_y) - HIGH_BOUND_Y) > 1 ){
 					if ( delta_ball_dir > 0.02 && fabs( fabs(IP_x) - HIGH_BOUND_X) > 1 && fabs( fabs(IP_y) - HIGH_BOUND_Y) > 1 ){
@@ -514,7 +514,7 @@ void chase_ball(double IP_x, double IP_y, double K_0 = chase_param[0],  double K
 					}
 
 
-				if (current_dist_2ball > 0.5){
+				if (current_dist_2ball > K_4){
 					component_vector[2] = react_move_to_position(gps_value[0] + 0.21 * cos(current_robot_dir), gps_value[1] + 0.21 * sin(current_robot_dir), \
 				              IP_x, IP_y, ball_position[0], ball_position[1]);
 					component_vector[2].ippai(K_2);
@@ -840,7 +840,7 @@ void fixed_self(double delta_w, Point q_goal){
 
 }
 
-		void field_shoot(double x, double y, Dot bx = default_bx, Dot by = default_by)
+		void field_shoot(double x, double y, Dot bx = default_bx, Dot by = default_by, double K1 = pass_param[1], double K2 = pass_param[2])
 		{
 
 		  if (wb_connector_get_presence(magnetic_sensor) == 0){
@@ -855,9 +855,9 @@ void fixed_self(double delta_w, Point q_goal){
 
 		    // cout << " request_distance b4     " << distance_query << '\n';
 
-		    if (distance_query < 3) distance_query *= 1.35;
+		    if (distance_query < 3) distance_query *= K1;
 		    else 
-	    	if (distance_query < 6) distance_query *= 1.47;
+	    	if (distance_query < 6) distance_query *= K2;
 		    else 
 			if (distance_query < 13) distance_query *= 1.2;
 		    else distance_query *= 1.2;
