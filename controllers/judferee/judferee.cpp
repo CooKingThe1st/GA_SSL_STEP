@@ -57,7 +57,6 @@ string init_ball_side = "Red_";
 
 // referee vari
 int i, j;
-int score[2] = {0, 0};
 const double TIME_FULL_MATCH = 90; //240;
 double match_time = TIME_FULL_MATCH;  // a match lasts for 3 minutes
 
@@ -245,7 +244,11 @@ void update_goal()
       ball_reset_timer -= (double)TIME_STEP / 1000.0;
       if (ball_reset_timer <= 0) {
         ball_reset_timer = 0;
-        restart_all();
+        
+
+        if (SPECIAL_INPUT_DEBUG == 0) restart_all();
+        else ball_reset_timer = 100000;
+
       }
     }
 }
@@ -260,13 +263,28 @@ void update_ga_signal(){
   GA_SIGNAL_TEST = int(receive_signal[0]);
 }
 
+// 1 equal to NON, 0 for SPN
 void update_fitness_value(unsigned int time_step_now, int scripted_id){
   GA_SIGNAL_TEST = 0;
     // cout << " DONE 1 cycle \n";
-  double fitness_return = 10000-wb_robot_get_time();
+  double fitness_return = 10000;
+
+  if (scripted_id == 1 || scripted_id == 2)
+    fitness_return = fitness_return -wb_robot_get_time();
+  else if (scripted_id == 3){
+    fitness_return = time_possession[1];
+
+    if (score[1] == 1 && pass_success[1] >= 1){
+      fitness_return = 5000 + time_possession[1] - wb_robot_get_time();
+    }
+    else if (score[1] == 0){
+      if (score[0] == 1) fitness_return = 500 + time_possession[1];
+      else fitness_return = 550 + time_possession[1];
+    }
+  }
 
   // transmit signal
-
+    cout << "fitness end " << fitness_return << '\n';
     string return_signal = std::to_string(1) + " " + std::to_string(fitness_return);
     clear_file("..\\log\\GA_RETURN.txt");
     log_to_file("..\\log\\GA_RETURN.txt", return_signal);
@@ -282,37 +300,39 @@ void command_decen(unsigned int time_step_now){
     {
       if (missing_player[player]) continue;
       try{
-
-        if (score[0] + score[1] > 0){
-          player_state[player] = 0; player_param_main[player] = -1000; player_param_sub[player] = -1000;
-          continue;
-        }
-
-
         Command_Pack get_command = Command_Pack{player, 0, -1000, -1000};
 
-        if (IntPack.vio_type == -1 || player != IntPack.executor){
-
-          double t_ball_position[2] = {ball_position[0], ball_position[1]}; 
-          if (IntPack.vio_type != -1) 
-            t_ball_position[0] = IntPack.VioPos.first,
-            t_ball_position[1] = IntPack.VioPos.second;
-
-          get_command = normal_gameplay(time_step_now, CURRENT_BRAIN_LEVEL, missing_player, player_position, player_ball, t_ball_position, player, Point{ball_moving_direction[0], ball_moving_direction[1]}, ball_velo, IntPack);
-
-          if (IntPack.vio_type != -1)
-            get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
-          // cout << "player " << player << " return " << get_command.player_id << '\n';
+        if (score[0] + score[1] > 0){
+          ;
+          // player_state[player] = 0; player_param_main[player] = -1000; player_param_sub[player] = -1000;
         }
-        else {
-          if (player_ball[player] < 1 || length_dist_vector(ball_position[0],ball_position[1], IntPack.VioPos.first, IntPack.VioPos.second) > 0.5)
-            get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
-          else{
-            get_command = normal_gameplay(time_step_now, CURRENT_BRAIN_LEVEL, missing_player, player_position, player_ball, ball_position, player, Point{ball_moving_direction[0], ball_moving_direction[1]}, ball_velo, IntPack);
+        else{
 
-            // cout << "    PENALTY RETURN  " << get_command.player_state << ' ' << get_command.sub_param_0 << ' ' << get_command.sub_param_1 << '\n';
-            get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
+
+          if (IntPack.vio_type == -1 || player != IntPack.executor){
+
+            double t_ball_position[2] = {ball_position[0], ball_position[1]}; 
+            if (IntPack.vio_type != -1) 
+              t_ball_position[0] = IntPack.VioPos.first,
+              t_ball_position[1] = IntPack.VioPos.second;
+
+            get_command = normal_gameplay(time_step_now, CURRENT_BRAIN_LEVEL, missing_player, player_position, player_ball, t_ball_position, player, Point{ball_moving_direction[0], ball_moving_direction[1]}, ball_velo, IntPack);
+
+            if (IntPack.vio_type != -1)
+              get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
+            // cout << "player " << player << " return " << get_command.player_id << '\n';
           }
+          else {
+            if (player_ball[player] < 1 || length_dist_vector(ball_position[0],ball_position[1], IntPack.VioPos.first, IntPack.VioPos.second) > 0.5)
+              get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
+            else{
+              get_command = normal_gameplay(time_step_now, CURRENT_BRAIN_LEVEL, missing_player, player_position, player_ball, ball_position, player, Point{ball_moving_direction[0], ball_moving_direction[1]}, ball_velo, IntPack);
+
+              // cout << "    PENALTY RETURN  " << get_command.player_state << ' ' << get_command.sub_param_0 << ' ' << get_command.sub_param_1 << '\n';
+              get_command = free_kick_mode(IntPack, get_command, player_position, player_ball);
+            }
+          }
+
         }
 
         // cout << " COMMAND DECEN " << player << " returnby " << get_command.player_id << " command " << get_command.player_state << '\n';
@@ -645,14 +665,12 @@ void get_initial_pose()
 void little_reroll(){
   if (!RANDOM_MODE) return;
 
-  if (!SPECIAL_INPUT_DEBUG){
+  if (SPECIAL_INPUT_DEBUG == 3 || SPECIAL_INPUT_DEBUG == 0){
 
     for (int i = 0; i < ROBOTS; i++){
       if (missing_player[i]) continue;
 
-      if (RANDOM_FILTER && i != 11) continue;
-
-      srand(i+time(0));
+      // srand(i+time(0));
       int choice = rand()%15;
       Point new_pose = bound_p(get_move_to_dir(Point{player_initial_position[i][0], player_initial_position[i][1]}, choice), 0.4);
       player_initial_position[i][0] = new_pose.first;
@@ -660,7 +678,7 @@ void little_reroll(){
       wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
     }
   }
-  else{
+  else if (SPECIAL_INPUT_DEBUG == 1 || SPECIAL_INPUT_DEBUG == 2) {
 
       double fix_rad = read_file("..\\log\\GA_ENV.txt")[0];
       fix_rad = read_file("..\\log\\GA_BASE_ENV.txt")[fix_rad];

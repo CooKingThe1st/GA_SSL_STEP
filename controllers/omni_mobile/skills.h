@@ -98,7 +98,7 @@ void on_springer(int on_timer, double distance_travel, double dir_shot_x, double
   applied_force = MIN(applied_force, MAX_FORCE);  
   applied_force = MAX(applied_force, 3);
 
-  std::cout << "                    APPLIED FORCE " << applied_force << " request_travel " << distance_travel << '\n'; 
+  // std::cout << "                    APPLIED FORCE " << applied_force << " request_travel " << distance_travel << '\n'; 
   wb_motor_set_position(springer, 0.128); 
   // double mono_vec = length_vector(robot_dir_y, robot_dir_x);
   double cheat_vec = length_vector(dir_shot_y, dir_shot_x);

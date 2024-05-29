@@ -5,6 +5,17 @@
 
 using namespace std;
 
+// MANUAL INSTRUCTIONS
+		// omni_mobile update_ga_param to sync with the current edited genome
+		// skills, update the param correlated with the edited genome (may need to remove the unnecesary randomness)
+		// judferee, update the corresponding fitness function, be it single or multi objectives
+		// scripted_command, update the corresponding script for planning the robots on field; also the terminating signal
+
+		// GA_thread, for the desired genome
+
+
+//
+
 							// include, K_0, K_1, K_2
 vector<double > chase_param  {4.571229,1.157314,4.421715,1.490760,0.321791}; //{2, 1.2, 1.3, 3, 0.5}; // the current version
 

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string.h>
 #include <cassert>  
+#include <time.h>       /* time_t, struct tm, time, localtime */
 
 #include <webots/emitter.h>
 #include <webots/receiver.h>
@@ -166,11 +167,34 @@ double fitness_function(Genome gene){
 // 	cout << "EVAL COUNT " << eval_count << '\n';
 // }
 
+std::string get_file_timestamp(int mode = 0)
+{
+  time_t rawtime;
+  struct tm * timeinfo;
+  char buffer[80];
+
+  time (&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  if (mode == 0) strftime(buffer,sizeof(buffer),"_%d-%m-%Y-%H-%M-%S",timeinfo);
+  else if (mode==1) strftime(buffer,sizeof(buffer),"_%d-%m-%Y",timeinfo);
+  else assert(false);
+  return std::string(buffer);
+}
+
 
 void GA_RUN(int num_village, int num_gen_run, int num_era){
-	Town oneshot(num_village, GA_popu_size, target_lb, target_ub);
+
+	// import old memory	
 
 	clear_file("..\\log\\GA_LOG.txt");
+	clear_file("..\\log\\GA_LOG_VIP.txt");
+
+	log_to_file("..\\log\\GA_LOG_VIP.txt", get_file_timestamp() + "\n" );
+
+	cout << get_file_timestamp() << '\n';
+
+	Town oneshot(num_village, GA_popu_size, target_lb, target_ub);
 
 	int env_count = 0;
 	// clear_file("..\\log\\GA_ENV.txt");
@@ -188,7 +212,7 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 			string gen_leader = " VILLAGER_LEADER ";
 			for (auto j = 0; j < (int)oneshot.village[0].cell[0].second.adn.size(); j++)
 				gen_leader = gen_leader + std::to_string(oneshot.village[0].cell[0].second.adn[j]) + " ";
-			gen_leader = gen_leader + '\n';
+			gen_leader = gen_leader + "\n\n";
 
 			log_to_file("..\\log\\GA_LOG.txt", gen_result);
 			log_to_file("..\\log\\GA_LOG.txt", gen_leader);
@@ -204,8 +228,8 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 			gen_leader = gen_leader + std::to_string(oneshot.village[0].cell[0].second.adn[j]) + " ";
 		gen_leader = gen_leader + '\n';
 
-		log_to_file("..\\log\\GA_LOG.txt", gen_result);
-		log_to_file("..\\log\\GA_LOG.txt", gen_leader);
+		log_to_file("..\\log\\GA_LOG_VIP.txt", gen_result);
+		log_to_file("..\\log\\GA_LOG_VIP.txt", gen_leader);
 
 		env_count += 1;
 		clear_file("..\\log\\GA_ENV.txt");

@@ -39,7 +39,9 @@ Command_Pack GYM_SCRIPTED_COMMAND(unsigned int time_step_now, int player_ask_id,
 	        }
 
         }
-
+        else if (script_id == 3){
+        	return_command = origin_command;
+        }
         return return_command;
 }
 
@@ -57,6 +59,11 @@ bool GYM_TERMINATED_FLAG(unsigned int time_step_now, int script_id){
 
 		return player_ball[4];
 	}
+	else if (script_id == 3){
+		if (wb_robot_get_time() > 20) return true;
+		return ((score[0] + score[1]) > 0);
+	}
+	else return true;
 	// if (time_step_now > 20) return true;
 	// else return false;
 }

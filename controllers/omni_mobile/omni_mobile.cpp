@@ -42,7 +42,7 @@
 #define SPEC_DEBUG_MODE (robot_encrypted_id == 503)
 #define EMITTER_INFO 0
 
-#define GA_UPDATE 0
+#define GA_UPDATE 1
 
 #define ACTION_DEBUG_MODE 0
 #define WIRELESS_DEBUG_MODE 0
@@ -326,6 +326,9 @@ vector<double> read_file(string file_name){
 }
 
 void update_ga_param(){
+
+  if (ROBOT_TEAM == 0) return; // DONT CHANGE SPN
+
   std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
 
   // for (auto i = 0; i < (int)receive_signal.size(); i++)
@@ -337,7 +340,6 @@ void update_ga_param(){
       chase_param[i] = receive_signal[i];
     else 
       pass_param[i-5] = receive_signal[i];
-
 
   // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
 }

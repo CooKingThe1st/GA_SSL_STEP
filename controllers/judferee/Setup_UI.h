@@ -183,7 +183,7 @@ static void show_command(int *_state, int *ball_state, double *par_main, double 
 
 void set_visibility(){
     // WbNodeRef vpoint = wb_supervisor_node_get_from_def("VPOINT");
-    wb_supervisor_node_set_visibility(wb_supervisor_node_get_from_def("DUMMY") , vpoint, 0);
+    // wb_supervisor_node_set_visibility(wb_supervisor_node_get_from_def("DUMMY") , vpoint, 0);
 
     for (int i = 0; i < 7; i++)
       if (!missing_player[i]){

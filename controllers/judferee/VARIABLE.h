@@ -101,7 +101,7 @@ int manual_player = -1;
 
 
 // REFEREE STAT CHECK
-
+int score[2] = {0, 0};
 
 double time_possession[2] = {1, 1};
 double ball_attack_time[2] = {0, 0}; // total time in opponent field
