@@ -270,7 +270,7 @@ void update_fitness_value(unsigned int time_step_now, int scripted_id){
   double fitness_return = 10000;
 
   if (scripted_id == 1 || scripted_id == 2)
-    fitness_return = fitness_return -wb_robot_get_time();
+    fitness_return = fitness_return - wb_robot_get_time();
   else if (scripted_id == 3){
     fitness_return = time_possession[1];
 

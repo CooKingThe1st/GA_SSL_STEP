@@ -325,6 +325,9 @@ vector<double> read_file(string file_name){
     return return_double;
 }
 
+
+
+// IMPORTANT CHANGE HERE
 void update_ga_param(){
 
   if (ROBOT_TEAM == 0) return; // DONT CHANGE SPN

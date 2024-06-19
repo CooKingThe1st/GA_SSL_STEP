@@ -1,4 +1,7 @@
 #include "GeneticUtils.h"
+#include "__CHECKSUM__.h"
+
+
 #include <webots/Robot.hpp>
 
 #include <fstream>
@@ -13,6 +16,10 @@
 #include <webots/receiver.h>
 #include <webots/robot.h>
 #include <webots/supervisor.h>
+
+
+#define mems(a, x) memset((a), (x), sizeof(a))
+
 
 // WbDeviceTag ga_emitter, ga_receiver;
 
@@ -182,14 +189,46 @@ std::string get_file_timestamp(int mode = 0)
   return std::string(buffer);
 }
 
+#define MAXIMUM_STORE_VALUE 50
+double store_value[MAXIMUM_STORE_VALUE] = {0};
+
+uint32_t get_checksum(){
+	mems(store_value, MAXIMUM_STORE_VALUE);
+
+	int num_store_value_this_run = 3;
+	// get the important value to store here
+	store_value[0] = num_village;
+	store_value[1] = num_gen_run;
+	store_value[2] = num_era;
+
+	num_store_value_this_run += target_ub.size() + target_lb.size();
+	for (int i = 0; i < target_ub.size(); i++)
+		store_value[3 + i] = target_ub[i];
+
+	for (int i = 0; i < target_lb.size(); i++)
+		store_value[3 + target_ub.size() + i] = target_lb[i];
+
+
+	return vector_checksum_crc(store_value, num_store_value_this_run);
+}
+
+bool compare_checksum(uint32_t previous_run, uint32_t current_run){
+	return fabs(previous_run - current_run) < 0.0001;
+}
 
 void GA_RUN(int num_village, int num_gen_run, int num_era){
 
-	// import old memory	
+	uint32_t current_checksum = get_checksum();
+	uint32_t last_checksum = 0;
+
+
+
+	// CHECK SUM memory	
 
 	clear_file("..\\log\\GA_LOG.txt");
 	clear_file("..\\log\\GA_LOG_VIP.txt");
 
+	log_to_file("..\\log\\GA_LOG_VIP.txt", "CHECKSUM_" + std::to_string(get_checksum()) + "\n" );
 	log_to_file("..\\log\\GA_LOG_VIP.txt", get_file_timestamp() + "\n" );
 
 	cout << get_file_timestamp() << '\n';
@@ -254,9 +293,11 @@ int main(int argc, char **argv){
 
 	target_ub.insert(target_ub.end(), chase_param_ub.begin(), chase_param_ub.end());
 	target_ub.insert(target_ub.end(), pass_param_ub.begin(), pass_param_ub.end());
+	// target_ub.insert(target_ub.end(), simple_move2ball_param_ub.begin(), simple_move2ball_param_ub.end());
 
 	target_lb.insert(target_lb.end(), chase_param_lb.begin(), chase_param_lb.end());
 	target_lb.insert(target_lb.end(), pass_param_lb.begin(), pass_param_lb.end());
+	// target_lb.insert(target_lb.end(), simple_move2ball_param_lb.begin(), simple_move2ball_param_lb.end());
 
 	// ga_emitter = wb_robot_get_device("ga_emitter");
 	// ga_receiver = wb_robot_get_device("ga_receiver");
