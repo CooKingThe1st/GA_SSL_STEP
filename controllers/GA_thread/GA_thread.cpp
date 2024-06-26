@@ -254,9 +254,112 @@ pair<int, FitGene> check_memory(uint32_t current_checksum){
 	// return make_pair(count_era, FitGene(blank_fit, blank_gene));
 }
 
+
+#include <sys/stat.h>
+#include <unistd.h>
+uint32_t current_checksum;
+
+bool check_file_exist(const std::string& name){
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
+
+bool check_content(const std::string& name){
+	// first line have CHECKSUM, omit
+	// then log record of each generation in that era
+	// with the form:
+	//		GEN + gen_id + NUM_GENOME + num_genome + '\n'
+	// then the followings num_genome with its initial value (could have NULL value) at construction
+	//		Genome ADN Genome Initial Value
+	// this is must have
+	// 		FILLING
+	// then the followings num_genome with its filled value
+	// 		Genome ADN Genome FILLED value
+	// after check that all of the genomes has been tested and filled its value
+	//		BEST_ADN ADN
+	// 		THIS_GEN DIVERSITY diver_value FITNESS fitness_value 
+
+	// LOOP this until break or reach all generation, output
+	// 		END_OF_AN_ERA
+
+	// the process writes/reads all the genome infos IMMEDIATELY after construction.
+	// the FILLING process is DISCONTINUOUS
+
+	// CHECK CONTENT if all of the things has been filled then return True
+
+		std::ifstream inFile(name);
+		std::string line;
+
+		if (!(std::getline(inFile, line))) return 0;
+
+	    // Genome blank_gene; double blank_fit = 0;
+
+	    // pair<int, FitGene> blank_state = make_pair(0, FitGene(0, blank_gene));
+
+		// the 1st line contain the CHECKSUM
+	    std::istringstream iss(line);
+	    string tagger[5]; uint32_t history_era_checksum;
+
+	    if (!(iss >> tagger[0] >> history_era_checksum) or (tagger[0].find("CHECKSUM") == std::string::npos) 
+	     or (!(compare_checksum(last_checksum, current_checksum))) ) { 
+	    	clear_file(name);
+	    	std::ofstream(name) << "CHECKSUM " << std::to_string(current_checksum) << '\n';
+	    	return 0; 
+	    } // error
+
+	    // MATCH CHECKSUM, begin CHECKING data
+
+	    while (std::getline(inFile, line))
+		{
+			// CHECK 1st line info, or it will contain 
+			iss.str(line);
+			if (!(iss >> tagger[0])) assert(0);
+			if ( !(tagger[0].find("END_OF_AN_ERA") == std::string::npos) )
+				return 1; // CHECK TO THE END OF THE ERA
+			if ( (tagger[0].find("GEN") == std::string::npos) ) assert(0);
+
+			int tmp; int num_genome;
+			iss >> tmp >> tagger[1] >> num_genome;
+			
+			for (int i = 0; i < num_genome; i++){
+				if (!(std::getline(inFile, line))) assert(0);
+				// get the history genome
+			}
+			if (!(std::getline(inFile, line))) assert(0); // the FILLING line
+			for (int i = 0; i < num_genome; i++){
+				if (!(std::getline(inFile, line))) return 0; // still filling
+			}
+			if (!(std::getline(inFile, line))) assert(0); // the best adn line
+			if (!(std::getline(inFile, line))) assert(0); // the gen stat line
+		}
+
+	return 0;
+}
+
+int check_historia_era(int assumed_current_era_id){
+	for (int i = 0; i <= assumed_current_era_id; i++)
+	{
+		string era_log_file = "..\\live_history\\ERA_" + std::to_string(i) + ".txt";
+		if (!(check_file_exist(era_log_file))) {
+			// create file
+			std::ofstream(era_log_file) << "CHECKSUM " << std::to_string(current_checksum) << '\n';
+			return i;
+		}
+
+		if (!(check_content(era_log_file)) && i != assumed_current_era_id)
+			return i;
+	}
+	return assumed_current_era_id;
+}
+
+void fill_processing_era(int assumed_current_era_id){
+	// now modifying the oneshot_town, filled it with modified value of villagers
+	
+}
+
 void GA_RUN(int num_village, int num_gen_run, int num_era){
 
-	uint32_t current_checksum = get_checksum(num_village, num_gen_run, num_era);
+	current_checksum = get_checksum(num_village, num_gen_run, num_era);
 
 		cout << "current_checksum " << current_checksum << '\n';
 

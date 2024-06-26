@@ -21,7 +21,7 @@ using namespace std;
 // include cross-over and mutation operators
 // include fitness function
 
-double MAX_BOUND_FITNESS = 10000000000000;
+double MAX_BOUND_FITNESS = 100000000000;
 
 struct Genome{
 	std::vector<double > adn;
