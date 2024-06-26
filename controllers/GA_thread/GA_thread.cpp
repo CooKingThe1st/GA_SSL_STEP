@@ -287,6 +287,7 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 	if (return_check.first > 0)
 	{
 		cout << "IMPORTING MEMORY --------------------\n";
+		log_to_file("..\\live_history\\event_log.txt", "IMPORTING MEMORY --------------------\n");
 		// import this genome as the last survivor
 		num_era = max(1, num_era - return_check.first);
 		oneshot.end_of_an_era(return_check.second);

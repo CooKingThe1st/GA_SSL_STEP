@@ -47,5 +47,8 @@ void Town::history_town_load(string file_name)
 	;
 }
 
+void Town::history_write_new_era(int era_id){
+	;
+}
 
 #endif 

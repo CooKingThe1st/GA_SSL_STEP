@@ -333,6 +333,10 @@ struct Town{
 	vector<double> ori_upper_bound;
 
 
+	void history_write_new_era(int era_id);
+
+	void history_load(int num_era);
+
 	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound, bool RANDOM_RUN){
 		village.clear();
 		total_pop = POP;
@@ -384,6 +388,8 @@ struct Town{
 				if (random_run) village[i].cell.push_back(FitGene(-MAX_BOUND_FITNESS, pGene.second));
 				else village[i].cell.push_back(pGene);
 		}
+
+		history_write_new_era(1);
 	}
 
 	void history_town_load(string file_name);
