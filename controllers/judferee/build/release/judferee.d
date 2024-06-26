@@ -10,6 +10,7 @@ build/release/judferee.o: judferee.cpp \
  C:\Program\ Files\Webots/include/controller/c/webots/supervisor.h \
  C:\Program\ Files\Webots/include/controller/c/webots/contact_point.h \
  Setup_UI.h VARIABLE.h file_manipulate.h ..\omni_mobile\geometry.h plan.h \
- file_manipulate.h chrono.h keyboard_event.h \
+ ..\\GA_thread\target_parameter.h file_manipulate.h chrono.h \
+ keyboard_event.h \
  C:\Program\ Files\Webots/include/controller/c/webots/keyboard.h \
- ..\\GA_thread\target_parameter.h scripted_command.h
+ scripted_command.h

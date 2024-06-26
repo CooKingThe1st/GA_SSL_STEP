@@ -338,10 +338,10 @@ void update_ga_param(){
   //   simple_move2ball_param[i] = receive_signal[i];
 
 
-  for (auto i = 0; i < (int)receive_signal.size(); i++)
+  for (auto i = 0; i <= 7; i++)
     if (i <= 4)
       chase_param[i] = receive_signal[i];
-    else 
+    else if (i <= 7)
       pass_param[i-5] = receive_signal[i];
 
   // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";

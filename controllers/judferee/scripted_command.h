@@ -8,7 +8,7 @@
 Command_Pack GYM_SCRIPTED_COMMAND(unsigned int time_step_now, int player_ask_id, Command_Pack origin_command, int script_id){
 		Command_Pack return_command = Command_Pack{player_ask_id, 0, -1000, -1000};
 
-		if (script_id == 2){
+		if (script_id == 2 || script_id == 4){
 		          if (wb_robot_get_time() < 1.8){
 		            if (player_ask_id == 1) return_command = Command_Pack{1, 8, -1000, -1000};
 		            if (player_ask_id == 4) return_command = Command_Pack{4, 0, -1000, -1000};
@@ -26,6 +26,11 @@ Command_Pack GYM_SCRIPTED_COMMAND(unsigned int time_step_now, int player_ask_id,
 
 		            if (player_ask_id == 4) return_command = origin_command;
 		          }
+		          else if (player_ball[4] == 1 && script_id == 4){
+
+		          	// ?? should be shoot command
+		          	if (player_ask_id == 4) return_command = origin_command;
+		          }
         }
         else if (script_id == 1)
         {
@@ -39,9 +44,10 @@ Command_Pack GYM_SCRIPTED_COMMAND(unsigned int time_step_now, int player_ask_id,
 	        }
 
         }
-        else if (script_id == 3){
+        else if (script_id == 3 || script_id == 5){
         	return_command = origin_command;
         }
+
         return return_command;
 }
 
@@ -63,7 +69,21 @@ bool GYM_TERMINATED_FLAG(unsigned int time_step_now, int script_id){
 		if (wb_robot_get_time() > 20) return true;
 		return ((score[0] + score[1]) > 0);
 	}
+	else if (script_id == 4){
+		if (wb_robot_get_time() > 12) return true;
+		return ((score[0] + score[1]) > 0);
+	} 
+	else if (script_id == 5){
+		if (wb_robot_get_time() > 10) return true;
+		if (player_ball[11] > 0) return true;
+		
+		return ((score[0] + score[1]) > 0);
+		// return player_ball[4];
+	}
+	else if (script_id == 0) return false;
 	else return true;
+
+	return false;
 	// if (time_step_now > 20) return true;
 	// else return false;
 }

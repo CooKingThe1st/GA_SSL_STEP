@@ -133,6 +133,8 @@ struct Genome{
 	}
 };
 
+typedef pair< double, Genome > FitGene;
+
 double fitness_function(Genome gene);
 
 struct Village{
@@ -140,7 +142,7 @@ struct Village{
 	int num_generation = 0;
 	double current_diversity = 10000000;
 
-	vector<pair< double, Genome >> cell;
+	vector< FitGene> cell;
 
 	Village(){
 		popu_size = 0;
@@ -161,7 +163,7 @@ struct Village{
 		fitness_sort();
 	}
 
-	Village(vector<pair< double, Genome >> genomes){
+	Village(vector< FitGene> genomes){
 		popu_size = genomes.size();
 		num_generation = 0;
 		cell = genomes;
@@ -195,9 +197,9 @@ struct Village{
 	void genome_gen(){
 		if ((int)cell.size() < popu_size) auto_fill();
 
-		vector<pair< double, Genome > > next_gen;
+		vector< FitGene > next_gen;
 
-		vector<pair< double, Genome > > temp;
+		vector< FitGene > temp;
 
 		fitness_sort();
 
@@ -311,6 +313,9 @@ struct Village{
 
 		return false;
 	}
+
+
+	void history_gen_write(string file_name);
 };
 
 struct Town{
@@ -322,12 +327,13 @@ struct Town{
 
 	vector<Village> village;
 
+	bool random_run = 0;
 
 	vector<double> ori_lower_bound;
 	vector<double> ori_upper_bound;
 
 
-	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound){
+	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound, bool RANDOM_RUN){
 		village.clear();
 		total_pop = POP;
 		num_generation = 0;
@@ -337,6 +343,8 @@ struct Town{
 		town_diversity = 1000000;
 		ori_lower_bound = lower_bound;
 		ori_upper_bound = upper_bound;
+
+		random_run = RANDOM_RUN;
 
 		int init_village_POP = max(3, int(ceil(total_pop / numberVillage)));
 		if (init_village_POP * numberVillage < total_pop) init_village_POP ++;
@@ -348,21 +356,37 @@ struct Town{
 	// Town(ReplayPack ??){
 	// }
 
-	void end_of_an_era(){
+	void end_of_an_era(FitGene the_last_survivor){
 		numberVillage = initVillages;
 		num_generation = 0;
 		town_diversity = 1000000;
 
-		pair< double, Genome > the_last_survivor = village[0].cell[0];
-		village.clear();
+		// FitGene the_last_survivor = village[0].cell[0];
 
 		int init_village_POP = max(3, int(ceil(total_pop / numberVillage)));
+
+		int num_last_era_survivor = int(init_village_POP * GA_era_survival_rate);
+
+		vector<FitGene > set_last_survivors;
+		set_last_survivors.push_back(the_last_survivor);
+		for (int i = 0; i + 1 < num_last_era_survivor && i < int(village[0].cell.size()); i++)
+			set_last_survivors.push_back( village[0].cell[i] );
+		num_last_era_survivor = set_last_survivors.size();
+
+		village.clear();
+
+
 		if (init_village_POP * numberVillage < total_pop) init_village_POP ++;
 		for (int i = 0; i < numberVillage; i++){
-			village.push_back(  Village(init_village_POP - 1, ori_lower_bound, ori_upper_bound)  );
-			village[i].cell.push_back(the_last_survivor);
+			village.push_back(  Village(init_village_POP - num_last_era_survivor, ori_lower_bound, ori_upper_bound)  );
+
+			for (auto pGene : set_last_survivors)
+				if (random_run) village[i].cell.push_back(FitGene(-MAX_BOUND_FITNESS, pGene.second));
+				else village[i].cell.push_back(pGene);
 		}
 	}
+
+	void history_town_load(string file_name);
 
 	void town_gen(){
 
@@ -375,7 +399,7 @@ struct Town{
 			if (new_village_size * numberVillage < total_pop) new_village_size++;
 			// int new_town_size = new_village_size * numberVillage;
 
-			// vector<pair< double, Genome >> flatten;
+			// vector< FitGene> flatten;
 
 			// cout << "current vil " << numberVillage << " new_village_size " << new_village_size << " new_town_size " << new_town_size << " popu_size " << total_pop << '\n';
 
@@ -404,7 +428,7 @@ struct Town{
 			village.pop_back();
 
 			// for (int i = 0; i < numberVillage; i++){
-			// 	vector<pair< double, Genome >> new_resident;
+			// 	vector< FitGene> new_resident;
 			// 	new_resident.insert(new_resident.end(), flatten.begin() + i * new_village_size, flatten.begin() + (i+1) * new_village_size );
 
 			// 	village[i] = Village(new_resident);

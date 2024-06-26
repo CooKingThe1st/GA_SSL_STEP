@@ -1,5 +1,5 @@
 build/release/GA_thread.o: GA_thread.cpp GeneticUtils.h GeneticConfig.h \
- target_parameter.h \
+ target_parameter.h __CHECKSUM__.h GA_history.h \
  C:\Program\ Files\Webots/include/controller/cpp/webots/Robot.hpp \
  C:\Program\ Files\Webots/include/controller/c/webots/emitter.h \
  C:\Program\ Files\Webots/include/controller/c/webots/types.h \

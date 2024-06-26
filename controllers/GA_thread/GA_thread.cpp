@@ -1,6 +1,6 @@
 #include "GeneticUtils.h"
 #include "__CHECKSUM__.h"
-
+#include "GA_history.h"
 
 #include <webots/Robot.hpp>
 
@@ -30,37 +30,6 @@ int eval_count = 0;
 double MAX_BOUND_VALUE = 1000;
 double TIME_STEP;
 
-void log_to_file(string record_file_name, string data)
-{
-  	ofstream MyLog;
-    MyLog.open(record_file_name, ios::app);
-    MyLog << data;
-    MyLog.close();
-}
-
-void clear_file(string file_name){
-  std::ofstream ofs;
-  ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
-  ofs.close();
-}
-
-vector<double> read_file(string file_name){
-    std::ifstream ifile(file_name, std::ios::in);
-    std::vector<double> return_double;
-
-    //check to see that the file was opened correctly:
-    if (!ifile.is_open()) {
-        std::cerr << "There was a problem opening the " +file_name + "file!\n";
-        exit(1);//exit or do additional error checking
-    }
-
-    double num = 0.0;
-    //keep storing values from the text file so long as data exists:
-    while (ifile >> num) {
-        return_double.push_back(num);
-    }
-    return return_double;
-}
 
 double fitness_function(Genome gene){
 	eval_count += 1;
@@ -77,18 +46,14 @@ double fitness_function(Genome gene){
 	clear_file("..\\log\\GA_GENE.txt");
 
 	// marked4func_genome = gene;
-	// string str_gene = "";
+	string str_gene = "";
 
-	for (auto i = 0; i < (int)gene.adn.size(); i++){
-		// simple_move2ball_param[i] = gene.adn[i];
+	for (auto i = 0; i < (int)gene.adn.size(); i++)
 		// str_gene += std::to_string(gene.adn[i])
-		string single_gene = std::to_string(gene.adn[i]) + " ";
-		log_to_file("..\\log\\GA_GENE.txt", single_gene);
-		log_to_file("..\\log\\GA_LOG.txt", single_gene);
-		// cout << "TEST ADN " << gene.adn[i] << '\n';
-	}
-	log_to_file("..\\log\\GA_GENE.txt", "\n");
-	log_to_file("..\\log\\GA_LOG.txt", "\n");
+		str_gene = str_gene + std::to_string(gene.adn[i]) + ' ';
+
+	str_gene = str_gene + '\n';
+	log_to_file("..\\log\\GA_GENE.txt", str_gene);
 
 
 
@@ -140,6 +105,7 @@ double fitness_function(Genome gene){
 
 	cout << "     CYCLE END: FITNESS = " << fitness_return << '\n';
 
+	log_to_file("..\\log\\GA_LOG.txt", str_gene);
 	log_to_file("..\\log\\GA_LOG.txt", std::to_string(fitness_return));
 	log_to_file("..\\log\\GA_LOG.txt", "\n");
 
@@ -192,7 +158,7 @@ std::string get_file_timestamp(int mode = 0)
 #define MAXIMUM_STORE_VALUE 50
 double store_value[MAXIMUM_STORE_VALUE] = {0};
 
-uint32_t get_checksum(){
+uint32_t get_checksum(int num_village, int num_gen_run, int num_era){
 	mems(store_value, MAXIMUM_STORE_VALUE);
 
 	int num_store_value_this_run = 3;
@@ -202,10 +168,10 @@ uint32_t get_checksum(){
 	store_value[2] = num_era;
 
 	num_store_value_this_run += target_ub.size() + target_lb.size();
-	for (int i = 0; i < target_ub.size(); i++)
+	for (std::vector<int>::size_type i = 0; i < target_ub.size(); i++)
 		store_value[3 + i] = target_ub[i];
 
-	for (int i = 0; i < target_lb.size(); i++)
+	for (std::vector<int>::size_type i = 0; i < target_lb.size(); i++)
 		store_value[3 + target_ub.size() + i] = target_lb[i];
 
 
@@ -216,24 +182,117 @@ bool compare_checksum(uint32_t previous_run, uint32_t current_run){
 	return fabs(previous_run - current_run) < 0.0001;
 }
 
+
+// CHECKSUM 2673870707
+// TIME _20-06-2024-17-41-43
+// ERA_NUMGEN 4 FITNESS 9996.864000 DIVERSITY 107.238675
+// LEADER 1.735973 1.118648 1.897374 1.576486 2.150994 1.223151 0.870090 2.526435 
+// ERA_NUMGEN 4 FITNESS 9996.928000 DIVERSITY 76.802167
+// LEADER 1.398816 1.118648 1.806057 2.656941 0.831690 1.223151 1.128117 2.526435 
+// ERA_NUMGEN 4 FITNESS 9996.928000 DIVERSITY 34.654562
+// LEADER 1.411771 0.819657 1.806057 2.690440 1.271997 1.165333 1.098171 2.645536 
+// ERA_NUMGEN 4 FITNESS 9996.928000 DIVERSITY 44.264898
+// LEADER 1.897564 1.720789 2.926071 2.690440 0.010987 0.558842 1.344035 2.749182 
+// ERA_NUMGEN 0 FITNESS 9996.928000 DIVERSITY 30.755423
+// LEADER 4.351634 0.392315 0.387585 4.847560 2.175726 0.935954 1.096408 1.258156 
+// ERA_NUMGEN 0 FITNESS 4994.176000 with Div 70.679377
+// LEADER 2.965322 1.064897 0.614072 5.641337 1.423737 1.241185 0.957835 1.407819 
+// ERA_NUMGEN 5 FITNESS 4994.176000 DIVERSITY 145.760033
+// LEADER 4.413892 0.900906 0.079501 4.570452 1.175481 0.997287 1.077181 1.497543 
+// ERA_NUMGEN 3 FITNESS 4994.400000 DIVERSITY 74.714629
+// LEADER 4.412019 0.927147 0.086851 5.246892 1.178347 0.986995 1.077532 1.497668 
+
+
+
+pair<int, FitGene> check_memory(uint32_t current_checksum){
+
+    int count_era = 0; Genome blank_gene; double blank_fit = 0;
+    pair<int, FitGene> blank_state = make_pair(0, FitGene(0, blank_gene));
+
+	std::ifstream inFile("..\\log\\GA_LOG_VIP.txt");
+	std::string line;
+	if (!(std::getline(inFile, line))) return blank_state;
+	// the 1st line contain the CHECKSUM
+    std::istringstream iss(line);
+    string tagger; uint32_t last_checksum;
+
+    if (!(iss >> tagger >> last_checksum)) { return blank_state; } // error
+    if (tagger.find("CHECKSUM") == std::string::npos) {return blank_state; }
+
+    	cout << "mem_checksum " << last_checksum << '\n';
+    if (!(compare_checksum(last_checksum, current_checksum))) {return blank_state; }
+
+    // MATCH CHECKSUM, begin merging data
+    	std::getline(inFile, line); // read time
+    	cout << " READ GENE \n"; 
+    while (std::getline(inFile, line))
+	{
+		// 1st line have numgen double fitness double diversity double
+		std::istringstream fss(line);
+		fss >> tagger >> blank_fit;
+		fss >> tagger >> blank_fit;
+
+		// 2nd line have leader genome adn
+		std::getline(inFile, line);
+
+		std::istringstream gss(line);
+		gss >> tagger;
+
+		std::vector<double> imported_adn;
+		double adn_t;
+		while (gss >> adn_t) imported_adn.push_back(adn_t);
+
+		cout << blank_fit << " fitgene " << imported_adn.size() << '\n';
+
+		blank_gene = Genome(imported_adn);
+		// import value to genome
+		count_era++;
+	}
+
+	return make_pair(count_era, FitGene(-MAX_BOUND_FITNESS, blank_gene));
+
+	// return make_pair(count_era, FitGene(blank_fit, blank_gene));
+}
+
 void GA_RUN(int num_village, int num_gen_run, int num_era){
 
-	uint32_t current_checksum = get_checksum();
-	uint32_t last_checksum = 0;
+	uint32_t current_checksum = get_checksum(num_village, num_gen_run, num_era);
 
+		cout << "current_checksum " << current_checksum << '\n';
 
+	pair<int, FitGene> return_check = check_memory(current_checksum);
+
+	// cout << get_file_timestamp() << '\n';
+
+	cout << " READING MEMORY ---------------  " << return_check.first << '\n';
 
 	// CHECK SUM memory	
+	if (return_check.first == 0) {
+		cout << "NEW MEMORY ----------------\n";
+		clear_file("..\\log\\GA_LOG_VIP.txt");
+		log_to_file("..\\log\\GA_LOG_VIP.txt", "CHECKSUM " + std::to_string(get_checksum(num_village, num_gen_run, num_era)) + "\n" );
+		log_to_file("..\\log\\GA_LOG_VIP.txt", "TIME " + get_file_timestamp() + "\n" );
 
-	clear_file("..\\log\\GA_LOG.txt");
-	clear_file("..\\log\\GA_LOG_VIP.txt");
+		clear_file("..\\log\\GA_LOG.txt");
+	}
+	
 
-	log_to_file("..\\log\\GA_LOG_VIP.txt", "CHECKSUM_" + std::to_string(get_checksum()) + "\n" );
-	log_to_file("..\\log\\GA_LOG_VIP.txt", get_file_timestamp() + "\n" );
+	bool RANDOM_RUN = 0;
 
-	cout << get_file_timestamp() << '\n';
+	vector<double> judferee_param = read_file("..\\log\\JUDFEREE_PARAM.txt");
+	RANDOM_RUN = bool(judferee_param[1]);
 
-	Town oneshot(num_village, GA_popu_size, target_lb, target_ub);
+	Town oneshot(num_village, GA_popu_size, target_lb, target_ub, RANDOM_RUN);
+
+	if (return_check.first > 0)
+	{
+		cout << "IMPORTING MEMORY --------------------\n";
+		// import this genome as the last survivor
+		num_era = max(1, num_era - return_check.first);
+		oneshot.end_of_an_era(return_check.second);
+	}
+
+	
 
 	int env_count = 0;
 	// clear_file("..\\log\\GA_ENV.txt");
@@ -261,8 +320,8 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 		// cout << " NEW ERA " <<  oneshot.num_generation << " has best " << oneshot.town_fitness_best_gen() << " with Div " << oneshot.town_diversity_get() << '\n';
 		// cout << " PACK LEADER " << oneshot.village[0].cell[0].second << '\n';
 
-		string gen_result = "NEW_ERA " + std::to_string(oneshot.num_generation) + " has best " + std::to_string(oneshot.town_fitness_best_gen()) + " with Div " + std::to_string(oneshot.town_diversity_get()) + "\n";
-		string gen_leader = " ERA_LEADER ";
+		string gen_result = "ERA_NUMGEN " + std::to_string(num_era) + " FITNESS " + std::to_string(oneshot.town_fitness_best_gen()) + " DIVERSITY " + std::to_string(oneshot.town_diversity_get()) + "\n";
+		string gen_leader = "LEADER ";
 		for (auto j = 0; j < (int)oneshot.village[0].cell[0].second.adn.size(); j++)
 			gen_leader = gen_leader + std::to_string(oneshot.village[0].cell[0].second.adn[j]) + " ";
 		gen_leader = gen_leader + '\n';
@@ -273,9 +332,9 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 		env_count += 1;
 		clear_file("..\\log\\GA_ENV.txt");
 		log_to_file("..\\log\\GA_ENV.txt", std::to_string(env_count));
-		oneshot.end_of_an_era();
+		oneshot.end_of_an_era(oneshot.village[0].cell[0]);
 	}
-	clear_file("..\\log\\GA_ENV.txt");
+	// clear_file("..\\log\\GA_ENV.txt");
 	log_to_file("..\\log\\GA_ENV.txt", 0);
 
 	cout << "EVAL COUNT " << eval_count << '\n';
@@ -283,7 +342,7 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 
 
 
-// 5 100 2
+// 5 20 12
 int main(int argc, char **argv){
 	srand(time(0));
 	wb_robot_init();
@@ -294,10 +353,13 @@ int main(int argc, char **argv){
 	target_ub.insert(target_ub.end(), chase_param_ub.begin(), chase_param_ub.end());
 	target_ub.insert(target_ub.end(), pass_param_ub.begin(), pass_param_ub.end());
 	// target_ub.insert(target_ub.end(), simple_move2ball_param_ub.begin(), simple_move2ball_param_ub.end());
+	target_ub.insert(target_ub.end(), pass_strategy_param_ub.begin(), pass_strategy_param_ub.end());
 
 	target_lb.insert(target_lb.end(), chase_param_lb.begin(), chase_param_lb.end());
 	target_lb.insert(target_lb.end(), pass_param_lb.begin(), pass_param_lb.end());
 	// target_lb.insert(target_lb.end(), simple_move2ball_param_lb.begin(), simple_move2ball_param_lb.end());
+	target_lb.insert(target_lb.end(), pass_strategy_param_lb.begin(), pass_strategy_param_lb.end());
+
 
 	// ga_emitter = wb_robot_get_device("ga_emitter");
 	// ga_receiver = wb_robot_get_device("ga_receiver");

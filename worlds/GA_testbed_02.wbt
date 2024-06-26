@@ -41,8 +41,8 @@ WorldInfo {
   ]
 }
 DEF VPOINT Viewpoint {
-  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position 1.1169685557914135 1.517959579440134 26.09702303779012
+  orientation -0.571567126220158 0.577311600540502 0.5831143422226843 2.077050913413072
+  position 1.2770907643690732 -0.11620217449579745 33.99459107441147
   near 0.08
   followSmoothness 0.15
 }
@@ -608,7 +608,7 @@ DEF DUMMY Robot {
               ]
               endPoint Solid {
                 translation 0.0002593037394507113 0.0003883040582054471 2.574748683597387e-05
-                rotation 0.0010866652493736362 0.9999989916169848 -0.0009142886028535298 2.3550062913974505
+                rotation 0.0010866652493736364 0.9999989916169849 -0.0009142886028535299 2.3550062913974505
                 children [
                   DEF OMNIWHEEL Shape {
                     appearance PBRAppearance {
@@ -725,7 +725,7 @@ DEF DUMMY Robot {
               ]
               endPoint Solid {
                 translation 0.0002317177724315832 -0.00038494171069713924 5.4183369602466016e-05
-                rotation -0.0015085491381028895 0.9999988547252235 0.00012176920548127649 2.2447531738458837
+                rotation -0.0015085491381028892 0.9999988547252234 0.00012176920548127648 2.2447531738458837
                 children [
                   DEF OMNIWHEEL Shape {
                     appearance PBRAppearance {
@@ -2875,7 +2875,7 @@ DEF ADD_ON Group {
   ]
 }
 DEF NON_ST Robot {
-  translation 3 -2.07 -1.90292e-13
+  translation -3.45755 5.8948 -1.90292e-13
   rotation 0 0 1 -3.121955307179586
   children [
     Pose {
@@ -5135,7 +5135,7 @@ DEF NON_CB Robot {
               ]
               endPoint Solid {
                 translation 3.12949738981182e-05 3.3415309088624505e-05 0.00033149161692955405
-                rotation -0.0007848874156518484 0.9999996310805832 0.0003489848742352792 1.3261053633466138
+                rotation -0.0007848874156518482 0.999999631080583 0.00034898487423527916 1.3261053633466138
                 children [
                   DEF OMNIWHEEL Shape {
                     appearance PBRAppearance {
@@ -5486,7 +5486,7 @@ DEF NON_CB Robot {
               ]
               endPoint Solid {
                 translation -7.544563948956687e-06 -2.9721336723297678e-05 0.000330734823802965
-                rotation 0.004836009062703815 -0.9999457147631268 0.009229330593520973 0.38267211673127366
+                rotation 0.004836009062703816 -0.999945714763127 0.009229330593520975 0.38267211673127366
                 children [
                   DEF OMNIWHEEL Shape {
                     appearance PBRAppearance {
@@ -7450,7 +7450,7 @@ DEF JUDFEREE Robot {
     "AI_LEVEL_0"
     "RAND_0"
     "MANUAL_0"
-    "SCRIPTED_0"
+    "SCRIPTED_4"
   ]
   supervisor TRUE
   cpuConsumption 50
@@ -7472,8 +7472,8 @@ DEF GA Robot {
   name "ga_host"
   controller "GA_thread"
   controllerArgs [
-    "5"
-    "50"
+    "3"
+    "10"
     "12"
   ]
   supervisor TRUE

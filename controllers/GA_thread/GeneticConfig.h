@@ -20,6 +20,7 @@ int GA_max_gen = 50;
 double GA_tourbin_size_rate = 0.2;
 
 
+double GA_era_survival_rate = 0.3;
 
 
 #endif 

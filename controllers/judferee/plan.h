@@ -19,6 +19,16 @@
 
 #endif
 
+
+#ifdef __linux__ 
+  #include "../GA_thread/target_parameter.h"
+#elif _WIN32
+  #include "..\\GA_thread\target_parameter.h"
+#else
+#endif
+
+
+
 #include "file_manipulate.h"
 
 #define ROBOTS (7*2)  // number of robots
@@ -1249,21 +1259,21 @@ Command_Pack switch_to_attack(unsigned int time_step_now,  bool *missing, double
 				if (ATTACK_DEBUG_MODE) cout << "TIMED " << time_diff << " PASS MODE cal with " << ball_holder << " have reward  " << total_attack_point << " at point " << field_pos.first << " " << field_pos.second << " with component ball_traj_rew " << ball_traj_reward << " ball_call " << ball_traj_tree.get_num_risk() << " rec_offb_rew " << receiver_offball_reward << " rec_traj_rew " << receiver_traj_reward << " receiver_atk_rew " << receiver_attack_reward << '\n';
 
 
-				if (PAPER_ATTAK_MODE){
-					string reward = std::to_string(gid) + "   " + std::to_string(ball_traj_reward) + "   " + std::to_string(receiver_offball_reward) +\
-					 "   " + std::to_string(receiver_traj_reward) + "   " + std::to_string(receiver_attack_reward) + "   " + std::to_string(total_attack_point) + "\n";
-					 cout << "HERE " << reward;
-					// log_to_file("temp.txt", reward);
+					if (PAPER_ATTAK_MODE){
+						string reward = std::to_string(gid) + "   " + std::to_string(ball_traj_reward) + "   " + std::to_string(receiver_offball_reward) +\
+						 "   " + std::to_string(receiver_traj_reward) + "   " + std::to_string(receiver_attack_reward) + "   " + std::to_string(total_attack_point) + "\n";
+						 cout << "HERE " << reward;
+						// log_to_file("temp.txt", reward);
 
-					COUNTER_LOG += 1;
-				}
+						COUNTER_LOG += 1;
+					}
 				// if (BALL_HOLDER_IN_STUCK) total_attack_point -= receiver_attack_reward;
 	// SLACK TIME
 
 				// double ref_dist = length_dist_point(field_pos, Point{player_pos[8][0], player_pos[8][1]});
 				// if (ATTACK_DEBUG_MODE && ref_dist < 2) cout << "PASS MODE cal with CB have reward  " << total_attack_point << " at point " << field_pos.first << " " << field_pos.second << " with component ball_traj_rew " << ball_traj_reward << " ball_call " << ball_traj_tree.get_num_risk() << " rec_offb_rew " << receiver_offball_reward << " rec_atk_rew " << receiver_attack_reward << " rec_traj_rew " << receiver_traj_reward  << '\n';
 
-				if (ball_traj_reward < 22) continue;
+				if (ball_traj_reward + pass_strategy_param[0] < 22) continue;
 				// if (ball_traj_reward < 26) continue;
 				// if (ball_traj_reward < 40) continue;
 
@@ -1273,7 +1283,7 @@ Command_Pack switch_to_attack(unsigned int time_step_now,  bool *missing, double
 					total_attack_point += 30;
 
 				if (closest_robot != ball_holder)
-					total_attack_point += 10;
+					total_attack_point += 10 + pass_strategy_param[1];
 
 				if (total_attack_point > best_rec_point[closest_robot])
 					best_rec_point[closest_robot] = total_attack_point;//MAX(best_rec_point[closest_robot], total_attack_point);
@@ -1554,12 +1564,26 @@ Command_Pack guess_ball_strategy( bool *missing, double player_pos[][3], int *pl
 	}
 }
 
+// IMPORTANT CHANGE HERE
+void update_ga_param(int this_id){
+
+  if (this_id >= 7) return; // DONT CHANGE SPN
+
+  std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
+
+  for (auto i = 8; i < (int)receive_signal.size(); i++)
+      pass_strategy_param[i-8] = receive_signal[i];
+  // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
+}
+
 
 Command_Pack normal_gameplay(unsigned int time_step_now, int brain_level, bool *missing, double player_pos[][3], int *player_ball,  double *ball_pos, int this_id, Point ball_moving_direction, double ball_velo, interuptPack IPACK_){
 // easy first, decision here, high_level
 
 	BRAIN_LEVEL = brain_level;
 	IPACK = IPACK_;
+
+	update_ga_param(this_id);
 
 	int whose_team_ball = get_team_possesion(player_ball);
 	// if (TACKLE_DEBUG_MODE)

@@ -22,14 +22,6 @@
 #include "chrono.h"
 #include "keyboard_event.h"
 
-#ifdef __linux__ 
-  #include "../GA_thread/target_parameter.h"
-#elif _WIN32
-  #include "..\\GA_thread\target_parameter.h"
-#else
-
-#endif
-
 #include "scripted_command.h"
 
 #define INFO_MODE 0
@@ -275,12 +267,30 @@ void update_fitness_value(unsigned int time_step_now, int scripted_id){
     fitness_return = time_possession[1];
 
     if (score[1] == 1 && pass_success[1] >= 1){
-      fitness_return = 5000 + time_possession[1] - wb_robot_get_time();
+      fitness_return = 6000 + time_possession[1] - wb_robot_get_time();
     }
     else if (score[1] == 0){
-      if (score[0] == 1) fitness_return = 500 + time_possession[1];
+      if (score[0] == 1) fitness_return = 400 + time_possession[1];
       else fitness_return = 550 + time_possession[1];
     }
+  }
+  else if (scripted_id == 4){
+    fitness_return = fitness_return - wb_robot_get_time();
+
+    if (score[1] > 0 && pass_success[1] >= 1)
+      fitness_return = 6000 - wb_robot_get_time();
+    else if (score[1] == 0 && pass_success[1] >= 1)
+      fitness_return = 400 - wb_robot_get_time();
+    else fitness_return = 50;
+  }
+  else if (scripted_id == 5){
+
+// TESTING
+    if (score[1] > 0 && pass_success[1] >= 1)
+      fitness_return = 6000 + 100 * pass_success[1] + 50 * shoot_attempt[1] + 20 * pass_attempt[1] - wb_robot_get_time();
+    else if (score[1] == 0 && pass_success[1] >= 1)
+      fitness_return = 420 + 100 * pass_success[1] + 50 * shoot_attempt[1] - wb_robot_get_time();
+    else fitness_return = 50;
   }
 
   // transmit signal
@@ -678,7 +688,7 @@ void little_reroll(){
       wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
     }
   }
-  else if (SPECIAL_INPUT_DEBUG == 1 || SPECIAL_INPUT_DEBUG == 2) {
+  else if (SPECIAL_INPUT_DEBUG == 1 || SPECIAL_INPUT_DEBUG == 2 || SPECIAL_INPUT_DEBUG >= 4) {
 
       double fix_rad = read_file("..\\log\\GA_ENV.txt")[0];
       fix_rad = read_file("..\\log\\GA_BASE_ENV.txt")[fix_rad];
@@ -738,6 +748,10 @@ void process_sysvar(int argc, char **argv){
     // std::cout << "first 'AI' found at: " << temp.substr(found_level) << '\n';
     SPECIAL_INPUT_DEBUG =  (temp.back() - '0');
 
+  string param_concat = std::to_string(CURRENT_BRAIN_LEVEL) + ' ' + std::to_string(RANDOM_MODE) + ' ' + std::to_string(MANUAL_MODE) + ' ' + std::to_string(SPECIAL_INPUT_DEBUG) + '\n';
+
+  clear_file("..\\log\\JUDFEREE_PARAM.txt");
+  log_to_file("..\\log\\JUDFEREE_PARAM.txt", param_concat);
 }
 
 
@@ -793,7 +807,6 @@ int main(int argc, char **argv) {
 
       update_ball_teamCon_Stat();
       update_ball_touch_euler();
-
       
       if (SPECIAL_INPUT_DEBUG){
         update_ga_signal();

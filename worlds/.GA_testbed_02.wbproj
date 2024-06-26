@@ -4,6 +4,7 @@ simulationViewPerspectives: 000000ff000000010000000200000100000004b1010000000201
 sceneTreePerspectives: 000000ff00000001000000030000001e000002d6000000fa0100000002010000000200
 maximizedDockId: -1
 centralWidgetVisible: 1
+projectionMode: PERSPECTIVE
 orthographicViewHeight: 1
 textFiles: 2 "controllers/judferee/judferee.cpp" "controllers/GA_thread/GA_thread.cpp" "controllers/omni_mobile/omni_mobile.cpp"
 consoles: Console:All:All
