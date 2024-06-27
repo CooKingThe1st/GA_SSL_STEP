@@ -7470,7 +7470,7 @@ DEF GA Robot {
     }
   ]
   name "ga_host"
-  controller "GA_thread"
+  controller "GA_verDiscrete"
   controllerArgs [
     "3"
     "10"

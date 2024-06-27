@@ -207,7 +207,7 @@ bool compare_checksum(uint32_t previous_run, uint32_t current_run){
 pair<int, FitGene> check_memory(uint32_t current_checksum){
 
     int count_era = 0; Genome blank_gene; double blank_fit = 0;
-    pair<int, FitGene> blank_state = make_pair(0, FitGene(0, blank_gene));
+    pair<int, FitGene> blank_state = make_pair(-1, FitGene(0, blank_gene));
 
 	std::ifstream inFile("..\\log\\GA_LOG_VIP.txt");
 	std::string line;
@@ -301,7 +301,7 @@ bool check_content(const std::string& name){
 	    string tagger[5]; uint32_t history_era_checksum;
 
 	    if (!(iss >> tagger[0] >> history_era_checksum) or (tagger[0].find("CHECKSUM") == std::string::npos) 
-	     or (!(compare_checksum(last_checksum, current_checksum))) ) { 
+	     or (!(compare_checksum(history_era_checksum, current_checksum))) ) { 
 	    	clear_file(name);
 	    	std::ofstream(name) << "CHECKSUM " << std::to_string(current_checksum) << '\n';
 	    	return 0; 
@@ -332,7 +332,6 @@ bool check_content(const std::string& name){
 			if (!(std::getline(inFile, line))) assert(0); // the best adn line
 			if (!(std::getline(inFile, line))) assert(0); // the gen stat line
 		}
-
 	return 0;
 }
 
@@ -359,8 +358,13 @@ void fill_processing_era(int assumed_current_era_id){
 
 void GA_RUN(int num_village, int num_gen_run, int num_era){
 
-	current_checksum = get_checksum(num_village, num_gen_run, num_era);
+	bool RANDOM_RUN = 0;
 
+	vector<double> judferee_param = read_file("..\\log\\JUDFEREE_PARAM.txt");
+	RANDOM_RUN = bool(judferee_param[1]);
+
+
+	current_checksum = get_checksum(num_village, num_gen_run, num_era);
 		cout << "current_checksum " << current_checksum << '\n';
 
 	pair<int, FitGene> return_check = check_memory(current_checksum);
@@ -370,32 +374,32 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
 	cout << " READING MEMORY ---------------  " << return_check.first << '\n';
 
 	// CHECK SUM memory	
-	if (return_check.first == 0) {
+	if (return_check.first == -1) {
 		cout << "NEW MEMORY ----------------\n";
 		clear_file("..\\log\\GA_LOG_VIP.txt");
 		log_to_file("..\\log\\GA_LOG_VIP.txt", "CHECKSUM " + std::to_string(get_checksum(num_village, num_gen_run, num_era)) + "\n" );
 		log_to_file("..\\log\\GA_LOG_VIP.txt", "TIME " + get_file_timestamp() + "\n" );
 
 		clear_file("..\\log\\GA_LOG.txt");
+		return_check.first = 0;
 	}
-	
+	// int this_era = check_historia_era(return_check.first);
 
-	bool RANDOM_RUN = 0;
 
-	vector<double> judferee_param = read_file("..\\log\\JUDFEREE_PARAM.txt");
-	RANDOM_RUN = bool(judferee_param[1]);
+	Town ghost(num_village, GA_popu_size, target_lb, RANDOM_RUN);
 
 	Town oneshot(num_village, GA_popu_size, target_lb, target_ub, RANDOM_RUN);
 
 	if (return_check.first > 0)
 	{
-		cout << "IMPORTING MEMORY --------------------\n";
+		cerr << "IMPORTING MEMORY --------------------\n";
 		log_to_file("..\\live_history\\event_log.txt", "IMPORTING MEMORY --------------------\n");
 		// import this genome as the last survivor
 		num_era = max(1, num_era - return_check.first);
 		oneshot.end_of_an_era(return_check.second);
 	}
 
+	cerr << " HEHEHEHEE " << num_era << ' ' << return_check.second.second.adn[-1] << '\n';
 	
 
 	int env_count = 0;

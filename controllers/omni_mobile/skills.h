@@ -195,9 +195,9 @@ Omni_Vector react_move_to_position(double  current_x, double current_y, double t
   	double temp_dir = atan2(t_pos_vector[1], t_pos_vector[0]);
   	double X = simple_move2ball_param[2]*(simple_move2ball_param[4]-exp(-simple_move2ball_param[3]*temp_len));
     // X = 6;
-      cout.setstate(std::ios::failbit) ;
-  		cout << "                    ATAN2 " << temp_len << "    LEN " << X << '\n';
-      cout.clear();
+    //   cout.setstate(std::ios::failbit) ;
+  		// cout << "                    ATAN2 " << temp_len << "    LEN " << X << '\n';
+    //   cout.clear();
 
   	t_pos_vector[0] = X * cos(temp_dir);
   	t_pos_vector[1] = X * sin(temp_dir);

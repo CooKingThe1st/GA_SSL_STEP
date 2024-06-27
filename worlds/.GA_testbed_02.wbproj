@@ -6,6 +6,6 @@ maximizedDockId: -1
 centralWidgetVisible: 1
 projectionMode: PERSPECTIVE
 orthographicViewHeight: 1
-textFiles: 1 "controllers/judferee/judferee.cpp" "controllers/GA_thread/GA_thread.cpp" "controllers/omni_mobile/omni_mobile.cpp"
+textFiles: 3 "controllers/judferee/judferee.cpp" "controllers/GA_thread/GA_thread.cpp" "controllers/omni_mobile/omni_mobile.cpp" "controllers/GA_verDiscrete/GA_verDiscrete.cpp"
 consoles: Console:All:All
 renderingDevicePerspectives: python_api:display;0;1;0;0

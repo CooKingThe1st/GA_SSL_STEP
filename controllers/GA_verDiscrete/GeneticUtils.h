@@ -142,6 +142,8 @@ struct Village{
 	int num_generation = 0;
 	double current_diversity = 10000000;
 
+	bool value_filled = 0;
+
 	vector< FitGene> cell;
 
 	Village(){
@@ -149,6 +151,25 @@ struct Village{
 		num_generation = 0;
 		cell.clear();
 	}
+
+
+	Village(int given_size, vector<double> lower_bound, vector<double> upper_bound, string mode){
+
+		assert(mode == string("TEMPLATE"));
+
+		cell.clear();
+		popu_size = given_size;
+		num_generation = 0;
+
+		for (int i = 0; i < popu_size; i++){
+			cell.push_back(make_pair(-MAX_BOUND_FITNESS, Genome(lower_bound, upper_bound))  );
+		}
+
+		value_filled = 0;
+		// fitness_get();
+		// fitness_sort();
+	}
+
 
 	Village(int given_size, vector<double> lower_bound, vector<double> upper_bound){
 		cell.clear();
@@ -177,6 +198,7 @@ struct Village{
 		for (std::vector<int>::size_type i = 0; i < cell.size(); i++)
 			if (cell[i].first - 1 < -MAX_BOUND_FITNESS)
 				cell[i].first = fitness_function(cell[i].second);
+		value_filled = 1;
 	}
 
 	void fitness_sort(){// descending order, the stronger is placed closer to 0
@@ -323,6 +345,7 @@ struct Town{
 	int initVillages;
 	int num_generation;
 	int total_pop;
+
 	double town_diversity;
 
 	vector<Village> village;
@@ -338,6 +361,50 @@ struct Town{
 	void history_load(int num_era);
 
 
+
+	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound, bool RANDOM_RUN, string mode){
+
+		assert(mode == string("TEMPLATE"));
+
+		total_pop = POP;
+		initVillages = init_village;		
+		// 
+		village.clear();
+		numberVillage = init_village; // is gonna change
+		num_generation = 0;
+
+		town_diversity = 1000000;
+		ori_lower_bound = lower_bound;
+		ori_upper_bound = upper_bound;
+
+		random_run = RANDOM_RUN;
+	}
+
+	void history_town_load(int num_Generation, int num_village, vector<FitGene> saved_gen_genomes){
+		num_generation = num_Generation;
+		numberVillage = num_village;
+		village.clear();
+
+		int init_village_POP = saved_gen_genomes.size() / num_village;
+		for (int i = 0; i < numberVillage; i++){
+			village.push_back( temp(vector<FitGene> (saved_gen_genomes.begin() + i * init_village_POP, saved_gen_genomes.begin() + (i+1) * init_village_POP, ) ) );
+		}
+	}
+
+	void suppress_gen(){
+		int init_village_POP = max(3, int(ceil(total_pop / numberVillage)));
+		if (init_village_POP * numberVillage < total_pop) init_village_POP ++;
+		for (int i = 0; i < numberVillage; i++){
+			village.push_back(  Village(init_village_POP, lower_bound, upper_bound, "TEMPLATE")  );
+		}		
+	}
+
+	vector<FitGene> compress_village(){
+		vector<FitGene> gen_genomes;
+		for (auto vill : village)
+				gen_genomes.insert(std::end(gen_genomes), std::begin(vill.cell), std::end(vill.cell));
+		return gen_genomes;
+	}
 
 	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound, bool RANDOM_RUN){
 		village.clear();
@@ -394,7 +461,6 @@ struct Town{
 		history_write_new_era(1);
 	}
 
-	void history_town_load(string file_name);
 
 	void town_gen(){
 
