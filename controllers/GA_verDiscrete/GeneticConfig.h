@@ -13,7 +13,7 @@
  // hyper-parameter
 
 int GA_popu_size = 50;
-double GA_Xover_rate = 0.8;
+double GA_Xover_rate = 0.7;
 double GA_mutate_rate = 0.2;
 
 int GA_max_gen = 50;

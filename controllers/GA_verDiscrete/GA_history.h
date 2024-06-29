@@ -38,29 +38,21 @@ vector<double> read_file(string file_name){
 
 
 bool check_file_exist(const std::string& name){
-  struct stat buffer;   
-  return (stat (name.c_str(), &buffer) == 0); 
+    return std::filesystem::exists(name);
 }
 
-// void Village::history_gen_write(string file_name)
-// {
-// 	;
-// }
 
-// void Town::history_town_load(string file_name)
-// {
-// 	;
-// }
-
-void history_write_new_era(Town& ghost, int era_id, int gen_id){
+void history_write_new_gen(Town& ghost, int era_id){
     string era_log_file = "..\\live_history\\ERA_" + std::to_string(era_id) + ".txt";
-
+        cerr << "  NOW writing new geneomes data \n";
     if (!(check_file_exist(era_log_file))) assert(0);
+
+        cerr << "  compress town \n";
 
     vector<FitGene> gen_genomes = ghost.compress_village();
 
     // GEN + gen_id + NUM_GENOME + num_genome + NUM_VILLAGE + num_village + '\n'
-    string generation_data = "GEN " + std::to_string(gen_id) + " NUM_GENOME " + std::to_string(gen_genomes.size()) + " NUM_VILLAGE " + std::to_string(ghost.numberVillage) + '\n';
+    string generation_data = "GEN " + std::to_string(ghost.num_generation) + " NUM_GENOME " + std::to_string(gen_genomes.size()) + " NUM_VILLAGE " + std::to_string(ghost.numberVillage) + '\n';
     log_to_file(era_log_file, generation_data);
 
     // THE VALUE
@@ -74,6 +66,27 @@ void history_write_new_era(Town& ghost, int era_id, int gen_id){
     log_to_file(era_log_file, "FILLING\n");
 
     // next is value
+}
+
+
+void history_write_new_era(Town& ghost, int era_id, uint32_t current_checksum){
+    string old_era_log_file = "..\\live_history\\ERA_" + std::to_string(era_id-1) + ".txt";
+    string eoae = "END_OF_AN_ERA\n";
+    log_to_file(old_era_log_file, eoae);
+
+        cerr << "                   FINISHING THIS ERA \n";
+
+
+    string era_log_file = "..\\live_history\\ERA_" + std::to_string(era_id) + ".txt";
+
+    if ((check_file_exist(era_log_file))) {
+        // reset data
+        clear_file(era_log_file);
+    }
+    std::ofstream(era_log_file) << "CHECKSUM " << std::to_string(current_checksum) << '\n';
+
+    history_write_new_gen(ghost, era_id);
+
 }
 
 #endif 

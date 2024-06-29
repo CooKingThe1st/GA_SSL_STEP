@@ -27,7 +27,6 @@
 Genome background_color;
 
 int eval_count = 0;
-double MAX_BOUND_VALUE = 1000;
 double TIME_STEP;
 
 
@@ -274,7 +273,7 @@ bool check_content(const std::string& name){
   //    BEST_ADN ADN
   //    THIS_GEN DIVERSITY diver_value FITNESS fitness_value 
 
-  // LOOP this until break or reach all generation, output
+  // LOOP this until break or reach all generation, output era info -> LOG_VIP
   //    END_OF_AN_ERA
 
   // the process writes/reads all the genome infos IMMEDIATELY after construction.
@@ -307,7 +306,7 @@ bool check_content(const std::string& name){
       while (std::getline(inFile, line))
     {
       // CHECK 1st line info, or it will contain 
-      iss.str(line);
+      iss.clear(); iss.str(line);
       if (!(iss >> tagger[0])) assert(0);
       if ( !(tagger[0].find("END_OF_AN_ERA") == std::string::npos) )
         return 1; // CHECK TO THE END OF THE ERA
@@ -348,17 +347,17 @@ int check_historia_era(int assumed_current_era_id){
   return assumed_current_era_id;
 }
 
-int this_gen = 0;
+int history_counter = -1;
 
 void fill_processing_era(int assumed_current_era_id, Town& ghost){
 
   // now modifying the oneshot_town, filled it with modified value of villagers
 // ONLY RUN ONCE
-  
+    string name =  "..\\live_history\\ERA_" + std::to_string(assumed_current_era_id) + ".txt";
     std::ifstream inFile(name);
     std::string line;
 
-    if (!(std::getline(inFile, line))) return 0;
+    if (!(std::getline(inFile, line))) return;
 
       // Genome blank_gene; double blank_fit = 0;
 
@@ -372,32 +371,42 @@ void fill_processing_era(int assumed_current_era_id, Town& ghost){
        or (!(compare_checksum(history_era_checksum, current_checksum))) ) { 
         clear_file(name);
         std::ofstream(name) << "CHECKSUM " << std::to_string(current_checksum) << '\n';
-        return 0; 
+        return; 
       } // error
+
+        log_to_file("..\\live_history\\event_log.txt", " checksum pass --------------------\n");
 
       // MATCH CHECKSUM, begin CHECKING data
 
     while (std::getline(inFile, line))
     {
       // CHECK 1st line info, or it will contain EOAE
-      iss.str(line);
+      iss.clear(); iss.str(line); 
       if (!(iss >> tagger[0])) assert(0);
       if ( (tagger[0].find("GEN") == std::string::npos) ) assert(0);
 
-      int tmp; int num_genome, num_village;
+          log_to_file("..\\live_history\\event_log.txt", " header pass --------------------\n");
+
+
+      int num_generation; int num_genome, num_village;
       iss >> num_generation >> tagger[1] >> num_genome >> tagger[2] >> num_village;
 
       assert(num_genome % num_village == 0);
       
+          log_to_file("..\\live_history\\event_log.txt", " module pass --------------------\n");
+          cerr << " CHECK LINE " << line << '\n';
+          cerr << " CHECK TAGGER " << tagger[0] << ' ' << tagger[1] << ' ' << tagger[2]  << '\n';
+          cerr << "  NOW READING " << num_generation << " generation with " << num_genome << " genomes of " << num_village << " villages " << '\n';
+          history_counter = -1;
       vector<FitGene> saved_gen_genomes;
 
       for (int i = 0; i < num_genome; i++){
         if (!(std::getline(inFile, line))) assert(0);
         // get the history genome
-        iss.str(line);
+        iss.clear(); iss.str(line); 
 
         std::vector<double> imported_adn; double adn_t;
-        while (gss >> adn_t) imported_adn.push_back(adn_t);
+        while (iss >> adn_t) imported_adn.push_back(adn_t);
         double initialFitnessValue = imported_adn.back(); imported_adn.pop_back();
 
         // fillinto the vector<FitGene>
@@ -412,25 +421,53 @@ void fill_processing_era(int assumed_current_era_id, Town& ghost){
         if (!(std::getline(inFile, line))) break; // still filling
 
         // get the history genome
-        iss.str(line);
+        iss.clear(); iss.str(line); 
 
         std::vector<double> imported_adn; double adn_t;
-        while (gss >> adn_t) imported_adn.push_back(adn_t);
+        while (iss >> adn_t) imported_adn.push_back(adn_t);
         double filledFitnessValue = imported_adn.back(); imported_adn.pop_back();
 
         saved_gen_genomes[i].first = filledFitnessValue;
+        history_counter ++;
       }
 
-      ghost.history_town_load(num_generation, num_village, saved_gen_genomes);
+        cerr << " NOW LOADING this generation TO town \n";
 
+      ghost.history_town_load(num_generation, num_village, saved_gen_genomes);
+      bool x =  ghost.terminate_ok(50);
+      cout << " TOWN TERMINATE " << x << '\n';
+
+        cerr << " DONE LOADING this generation \n";
       if (!(std::getline(inFile, line))) assert(0); // the best adn line
       if (!(std::getline(inFile, line))) assert(0); // the gen stat line
-      this_gen++;
     }
-  return 0;
+  return ;
+}
+
+void live_filling_value(Town &ghost, int h_counter, int which_era){
+
+  string name =  "..\\live_history\\ERA_" + std::to_string(which_era) + ".txt";
+
+  vector<FitGene> gen_genomes = ghost.compress_village();
+  for (int i = 0; i <= h_counter; i++)
+    assert(gen_genomes.size() > i and gen_genomes[i].first > -MAX_BOUND_FITNESS);
+
+  for (int i = h_counter + 1; i < int(gen_genomes.size()); i++){
+      if (gen_genomes[i].first - 1  < -MAX_BOUND_FITNESS){
+        gen_genomes[i].first = fitness_function(gen_genomes[i].second);
+      }
+      string FitGeneData = "";
+      for (auto aptx : gen_genomes[i].second.adn) FitGeneData = FitGeneData + std::to_string(aptx) + ' ';
+      FitGeneData = FitGeneData + std::to_string(gen_genomes[i].first) + '\n';
+      log_to_file(name, FitGeneData);
+      //  write to TBA
+    }
+  ghost.live_genome_load(gen_genomes);
 }
 
 void GA_RUN(int num_village, int num_gen_run, int num_era){
+
+  clear_file("..\\live_history\\event_log.txt");
 
   bool RANDOM_RUN = 0;
 
@@ -450,6 +487,10 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
   // CHECK SUM memory 
   if (return_check.first == -1) {
     cout << "NEW MEMORY ----------------\n";
+
+    log_to_file("..\\live_history\\event_log.txt", "NEW MEMORY --------------------\n");
+
+
     clear_file("..\\log\\GA_LOG_VIP.txt");
     log_to_file("..\\log\\GA_LOG_VIP.txt", "CHECKSUM " + std::to_string(get_checksum(num_village, num_gen_run, num_era)) + "\n" );
     log_to_file("..\\log\\GA_LOG_VIP.txt", "TIME " + get_file_timestamp() + "\n" );
@@ -457,55 +498,77 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
     clear_file("..\\log\\GA_LOG.txt");
     return_check.first = 0;
   }
+
+  log_to_file("..\\live_history\\event_log.txt", "CHECK OLD MEMORY --------------------\n");
+
   int this_era = check_historia_era(return_check.first);
+  cout << " CURRENT ERA " << this_era << '\n';
 
+  Town ghost(num_village, GA_popu_size, target_lb, target_ub, RANDOM_RUN, 'T');
 
-  Town ghost(num_village, GA_popu_size, target_lb, target_ub, RANDOM_RUN);
+  log_to_file("..\\live_history\\event_log.txt", "IMPORT OLD MEMORY --------------------\n");
   fill_processing_era(this_era, ghost);
+
+  log_to_file("..\\live_history\\event_log.txt", "DONE OLD MEMORY --------------------\n");
+
 
   if (ghost.village.size() == 0){
     // INITIAL, would be a function
+
+    log_to_file("..\\live_history\\event_log.txt", "WRITE NEW MEMORY --------------------\n");
+
     ghost.suppress_gen();
-    history_write_new_era(ghost, this_era, this_gen);
+    history_write_new_gen(ghost, this_era);
   }
   // Town oneshot(num_village, GA_popu_size, target_lb, target_ub, RANDOM_RUN);
 
-  if (this_era > 0)
-  {
-    cout << "IMPORTED MEMORY --------------------\n";
-    log_to_file("..\\live_history\\event_log.txt", "IMPORTING MEMORY --------------------\n");
-    // import this genome as the last survivor
-    num_era = this_era;
-  }
+  // if (this_era > 0)
+  // {
+  //   cout << "IMPORTED MEMORY --------------------\n";
+  //   log_to_file("..\\live_history\\event_log.txt", "IMPORTING MEMORY --------------------\n");
+  //   // import this genome as the last survivor
+  // }
 
   int env_count = 0;
   // clear_file("..\\log\\GA_ENV.txt");
   // log_to_file("..\\log\\GA_ENV.txt", 0);
 
-  while (num_era > 0){
-    num_era--;
+    cerr << " NOW PROCESSING ERA " << ghost.num_generation << '\n';
+
+  while (this_era < num_era){
     for (int i = ghost.num_generation; i < num_gen_run; i++){
 
-      filling_value(ghost);
-        history_fill_new_era(????);
+        cerr << "FILLING FROM INDEX " << history_counter << '\n';
+        log_to_file("..\\live_history\\event_log.txt", "FILLING FITNESS -------------------- of gen " + std::to_string(i) + '\n');
 
-      if (ghost.terminate_ok()) break;
+      live_filling_value(ghost, history_counter, this_era);
+      history_counter = -1;
+      ghost.town_sort();
+
+      if (ghost.terminate_ok(num_gen_run)) break;
       // cout << " COUNTER " << ghost.diversity_counter + ghost.fitness_counter  << '\n';
       // if (ghost.diversity_counter + ghost.fitness_counter > 0) 
       // std::cout << "Gen " << ghost.num_generation << " has best " << ghost.town_fitness_best_gen() << " with Div " << ghost.town_diversity_get() << " VILLAGER LEADER " << ghost.village[0].cell[0].second  << '\n';
 
-      string gen_result = "Gen " + std::to_string(ghost.num_generation) + " has best " + std::to_string(ghost.town_fitness_best_gen()) + " with Div " + std::to_string(ghost.town_diversity_get()) + "\n";
+      string gen_result = "Gen " + std::to_string(ghost.num_generation) + " FITNESS " + std::to_string(ghost.town_fitness_best_gen()) + " DIVERSITY " + std::to_string(ghost.town_diversity_get()) + "\n";
       string gen_leader = " VILLAGER_LEADER ";
       for (auto j = 0; j < (int)ghost.village[0].cell[0].second.adn.size(); j++)
         gen_leader = gen_leader + std::to_string(ghost.village[0].cell[0].second.adn[j]) + " ";
-      gen_leader = gen_leader + "\n\n";
+      gen_leader = gen_leader + "\n";
 
       log_to_file("..\\log\\GA_LOG.txt", gen_result);
       log_to_file("..\\log\\GA_LOG.txt", gen_leader);
 
-      ghost.town_gen();
+      string era_name =  "..\\live_history\\ERA_" + std::to_string(this_era) + ".txt";
+      log_to_file(era_name, gen_result);
+      log_to_file(era_name, gen_leader);
 
-          history_write_new_era(????);
+        log_to_file("..\\live_history\\event_log.txt", "GEN " + std::to_string(i) + " complete " + '\n');
+
+        if (i + 1 < num_gen_run) {
+          ghost.town_gen(1);
+          history_write_new_gen(ghost, this_era);
+        }
     }
     // cout << " NEW ERA " <<  ghost.num_generation << " has best " << ghost.town_fitness_best_gen() << " with Div " << ghost.town_diversity_get() << '\n';
     // cout << " PACK LEADER " << ghost.village[0].cell[0].second << '\n';
@@ -525,7 +588,15 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
       log_to_file("..\\log\\GA_ENV.txt", std::to_string(env_count));
     }
 
-    ghost.end_of_an_era(ghost.village[0].cell[0]);
+        log_to_file("..\\live_history\\event_log.txt", " NOW TRANSITING TO NEXT ERA \n" );
+
+    ghost.end_of_an_era(ghost.village[0].cell[0], 1);
+
+      this_era ++;
+
+        log_to_file("..\\live_history\\event_log.txt", " NOW WRITING \n");
+
+      history_write_new_era(ghost, this_era, current_checksum);
   }
   // clear_file("..\\log\\GA_ENV.txt");
   log_to_file("..\\log\\GA_ENV.txt", 0);

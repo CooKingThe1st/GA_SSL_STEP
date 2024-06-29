@@ -152,25 +152,6 @@ struct Village{
 		cell.clear();
 	}
 
-
-	Village(int given_size, vector<double> lower_bound, vector<double> upper_bound, string mode){
-
-		assert(mode == string("TEMPLATE"));
-
-		cell.clear();
-		popu_size = given_size;
-		num_generation = 0;
-
-		for (int i = 0; i < popu_size; i++){
-			cell.push_back(make_pair(-MAX_BOUND_FITNESS, Genome(lower_bound, upper_bound))  );
-		}
-
-		value_filled = 0;
-		// fitness_get();
-		// fitness_sort();
-	}
-
-
 	Village(int given_size, vector<double> lower_bound, vector<double> upper_bound){
 		cell.clear();
 		popu_size = given_size;
@@ -184,6 +165,25 @@ struct Village{
 		fitness_sort();
 	}
 
+	Village(int given_size, vector<double> lower_bound, vector<double> upper_bound, char mode){
+
+		assert(mode == 'T');
+
+		cell.clear();
+		popu_size = given_size;
+		num_generation = 0;
+
+		for (int i = 0; i < popu_size; i++){
+			cell.push_back(make_pair(-MAX_BOUND_FITNESS, Genome(lower_bound, upper_bound))  );
+		}
+
+		value_filled = 0;
+		fitness_fit();
+		// fitness_get();
+		// fitness_sort();
+	}
+
+
 	Village(vector< FitGene> genomes){
 		popu_size = genomes.size();
 		num_generation = 0;
@@ -192,20 +192,32 @@ struct Village{
 		fitness_sort();
 	}
 
+	Village(vector< FitGene> genomes, char mode){
+		popu_size = genomes.size();
+		num_generation = 0;
+		cell = genomes;
+		fitness_fit();
+	}
+
 	void set_popu(int new_size){ popu_size = new_size; }
 
 	void fitness_get(){
+		if (value_filled == 1) return;
 		for (std::vector<int>::size_type i = 0; i < cell.size(); i++)
 			if (cell[i].first - 1 < -MAX_BOUND_FITNESS)
 				cell[i].first = fitness_function(cell[i].second);
 		value_filled = 1;
 	}
 
+	void fitness_fit(){
+		while ((int)cell.size() > popu_size) cell.pop_back();
+	}
+
 	void fitness_sort(){// descending order, the stronger is placed closer to 0
 		sort(cell.begin(), cell.end(), [](pair<double, Genome> l_g, pair<double, Genome> r_g) {
     		return l_g.first > r_g.first;
 		});
-		while ((int)cell.size() > popu_size) cell.pop_back();
+		fitness_fit();
 	}
 
 	void auto_fill(){
@@ -216,7 +228,7 @@ struct Village{
 		fitness_get();
 	}
 
-	void genome_gen(){
+	void genome_gen(bool suppress = 0){
 		if ((int)cell.size() < popu_size) auto_fill();
 
 		vector< FitGene > next_gen;
@@ -226,7 +238,7 @@ struct Village{
 		fitness_sort();
 
 		// selection 
-
+			cerr << "  Village genome gen preparing tourbin round \n";
 		int Xover_popu = int(popu_size * GA_Xover_rate);
 		int tourbin_size = int(GA_tourbin_size_rate * popu_size) + 1;
 
@@ -263,13 +275,16 @@ struct Village{
 		// for (auto i : next_gen)
 		// 	cout << i.second << " with cost " << i.first << '\n';
 
-		int num_fill = popu_size - next_gen.size();
+		int num_fill = popu_size - next_gen.size() - 1;
+
+			cerr << "  Village genome gen filling " << num_fill << " from " << cell.size() << '\n';
+
 		// fill from the original
-		for (int i = 0; i < popu_size - num_fill; i++)
+		for (int i = 0; i < num_fill; i++)
 			next_gen.push_back(cell[i]);
 
 		// mutate operator
-		for (int i = 0; i < popu_size; i++){
+		for (int i = 0; i < popu_size - 1; i++){
 			bool is_mutated = ((double) rand() / (RAND_MAX)) <= GA_mutate_rate;
 			if (is_mutated == false) continue;
 
@@ -277,17 +292,25 @@ struct Village{
 			Genome mutated = next_gen[i].second.mutate_add();
 			if (choice == 0) { 
 				for (std::vector<int>::size_type jid = 0; jid < mutated.adn.size(); jid++)
-					mutated.adn[jid] = next_gen [  rand() % popu_size ].second.adn[jid];
+					mutated.adn[jid] = next_gen [  rand() % (popu_size - 1) ].second.adn[jid];
 			}
 
 			next_gen[i] = make_pair(-MAX_BOUND_FITNESS, mutated);
 		}
 
+			cerr << " DONE MUTATING \n";
+
+		next_gen.push_back(cell[0]);
+
+			cerr << " ADDING LAST CELL with fitness " << cell[0].first << '\n';
+
 		cell = next_gen;
 
-		fitness_get();
-		fitness_sort();
-
+		if (!suppress){
+			fitness_get();
+			fitness_sort();
+		}
+		fitness_fit();
 		// cout << " NEW GEN \n";
 		// for (auto i : cell)
 		// 	cout << i.second << " with cost " << i.first << '\n';
@@ -362,9 +385,9 @@ struct Town{
 
 
 
-	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound, bool RANDOM_RUN, string mode){
+	Town(int init_village, int POP, vector<double> lower_bound, vector<double> upper_bound, bool RANDOM_RUN, char mode){
 
-		assert(mode == string("TEMPLATE"));
+		assert(mode == 'T');
 
 		total_pop = POP;
 		initVillages = init_village;		
@@ -380,22 +403,27 @@ struct Town{
 		random_run = RANDOM_RUN;
 	}
 
+	void live_genome_load(vector<FitGene> saved_gen_genomes){
+		village.clear();
+
+		int init_village_POP = saved_gen_genomes.size() / numberVillage;
+		for (int i = 0; i < numberVillage; i++){
+			village.push_back( Village( vector<FitGene> (saved_gen_genomes.begin() + i * init_village_POP, saved_gen_genomes.begin() + (i+1) * init_village_POP ), 'T' )  );
+		}
+	}
+
 	void history_town_load(int num_Generation, int num_village, vector<FitGene> saved_gen_genomes){
 		num_generation = num_Generation;
 		numberVillage = num_village;
-		village.clear();
 
-		int init_village_POP = saved_gen_genomes.size() / num_village;
-		for (int i = 0; i < numberVillage; i++){
-			village.push_back( temp(vector<FitGene> (saved_gen_genomes.begin() + i * init_village_POP, saved_gen_genomes.begin() + (i+1) * init_village_POP, ) ) );
-		}
+		live_genome_load(saved_gen_genomes);		
 	}
 
 	void suppress_gen(){
 		int init_village_POP = max(3, int(ceil(total_pop / numberVillage)));
 		if (init_village_POP * numberVillage < total_pop) init_village_POP ++;
 		for (int i = 0; i < numberVillage; i++){
-			village.push_back(  Village(init_village_POP, lower_bound, upper_bound, "TEMPLATE")  );
+			village.push_back(  Village(init_village_POP, ori_lower_bound, ori_upper_bound, 'T')  );
 		}		
 	}
 
@@ -429,7 +457,7 @@ struct Town{
 	// Town(ReplayPack ??){
 	// }
 
-	void end_of_an_era(FitGene the_last_survivor){
+	void end_of_an_era(FitGene the_last_survivor, bool suppress = 0){
 		numberVillage = initVillages;
 		num_generation = 0;
 		town_diversity = 1000000;
@@ -446,23 +474,39 @@ struct Town{
 			set_last_survivors.push_back( village[0].cell[i] );
 		num_last_era_survivor = set_last_survivors.size();
 
+			cerr << " now merging with these " << num_last_era_survivor << " survivors " << " randomize " << random_run << '\n';
+			for (auto i : set_last_survivors) cerr << " fit " << i.first << ' ';
+				cerr << '\n';
 		village.clear();
 
 
 		if (init_village_POP * numberVillage < total_pop) init_village_POP ++;
 		for (int i = 0; i < numberVillage; i++){
-			village.push_back(  Village(init_village_POP - num_last_era_survivor, ori_lower_bound, ori_upper_bound)  );
+			if (!suppress)
+				village.push_back(  Village(init_village_POP - num_last_era_survivor, ori_lower_bound, ori_upper_bound)  );
+			else 
+				village.push_back(  Village(init_village_POP - num_last_era_survivor, ori_lower_bound, ori_upper_bound, 'T')  );
 
 			for (auto pGene : set_last_survivors)
 				if (random_run) village[i].cell.push_back(FitGene(-MAX_BOUND_FITNESS, pGene.second));
 				else village[i].cell.push_back(pGene);
-		}
 
-		history_write_new_era(1);
+			village[i].set_popu(init_village_POP);
+			village[i].fitness_fit();
+		}
 	}
 
 
-	void town_gen(){
+	void town_sort(){
+		for (auto& vill: village){
+			vill.fitness_get();
+			vill.fitness_sort();
+		}
+	
+
+	}
+
+	void town_gen(bool suppress = 0){
 
 		num_generation += 1;
 
@@ -475,12 +519,12 @@ struct Town{
 
 			// vector< FitGene> flatten;
 
-			// cout << "current vil " << numberVillage << " new_village_size " << new_village_size << " new_town_size " << new_town_size << " popu_size " << total_pop << '\n';
+			cerr << "----------------current vil " << numberVillage << " new_village_size " << new_village_size << " new_town_size " << new_village_size * numberVillage << " popu_size " << total_pop << '\n';
 
 			for (std::vector<int>::size_type jid = 0; jid + 1 < village.size(); jid++){
 				// village[jid].genome_gen();
 				// flatten.insert(flatten.end(), village[jid].cell.begin(), village[jid].cell.end());
-					// cout << " current vil popu " << village[jid].cell.size() << '\n';
+					cout << "  CURRENT vil popu " << village[jid].cell.size() << '\n';
 				village[jid].set_popu(new_village_size);
 				while((int)village[jid].cell.size() > new_village_size){
 					village[jid+1].cell.push_back(village[jid].cell.back());
@@ -490,8 +534,8 @@ struct Town{
 					village[jid].cell.push_back(village[jid+1].cell.back());
 					village[jid+1].cell.pop_back();
 				}
-					// cout << " current vil popu " << village[jid].cell.size() << '\n';
-				village[jid].genome_gen();
+					cout << "  NEW vil popu " << village[jid].cell.size() << ' ' << jid << '\n';
+				village[jid].genome_gen(suppress);
 
 				// cout << " gen_town " << village[jid].cell.size() << ' ';
 			}
@@ -509,8 +553,10 @@ struct Town{
 			// }
 		}
 		else{
-			village[0].genome_gen();
+			village[0].genome_gen(suppress);
 		}
+
+		cerr << " ???? done generate new genomes generation \n";
 	}
 
 	double town_diversity_get(){
@@ -531,10 +577,10 @@ struct Town{
 	double last_gen_diversity = -1; int diversity_counter = 0;
 	double last_gen_fitness = -1; int fitness_counter = 0;
 
-	bool terminate_ok(){
+	bool terminate_ok(int max_limit){
 		if (numberVillage > 1) return false;
 			// cout << num_generation << ' ' << GA_max_gen << '\n';
-		if (num_generation > GA_max_gen) return true;
+		if (num_generation > max_limit) return true;
 
 		double town_diversity = town_diversity_get();
 		// if  ( fabs(town_diversity - last_gen_diversity) * 50 < fabs(last_gen_diversity)) 
@@ -551,10 +597,10 @@ struct Town{
 		else fitness_counter = 0;
 		last_gen_fitness = this_gen_fitness;
 
-			// cout << " THIS TOWN COUNTER " << (diversity_counter * 10 > GA_max_gen) << ' ' << (fitness_counter * 10 > GA_max_gen) << '\n';
+			// cout << " THIS TOWN COUNTER " << (diversity_counter * 10 > max_limit) << ' ' << (fitness_counter * 10 > max_limit) << '\n';
 
-		if (diversity_counter * 10 > GA_max_gen) return true;
-		if (fitness_counter * 10 > GA_max_gen) return true;
+		if (diversity_counter * 3 > max_limit) return true;
+		if (fitness_counter * 3 > max_limit) return true;
 
 		return false;
 	}
