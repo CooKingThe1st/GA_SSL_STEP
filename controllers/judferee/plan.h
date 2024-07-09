@@ -21,9 +21,9 @@
 
 
 #ifdef __linux__ 
-  #include "../GA_thread/target_parameter.h"
+  #include "../GA_verDiscrete/target_parameter.h"
 #elif _WIN32
-  #include "..\\GA_thread\target_parameter.h"
+  #include "..\\GA_verDiscrete\target_parameter.h"
 #else
 #endif
 
@@ -1567,12 +1567,31 @@ Command_Pack guess_ball_strategy( bool *missing, double player_pos[][3], int *pl
 // IMPORTANT CHANGE HERE
 void update_ga_param(int this_id){
 
-  if (this_id >= 7) return; // DONT CHANGE SPN
-
   std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
 
-  for (auto i = 8; i < (int)receive_signal.size(); i++)
-      pass_strategy_param[i-8] = receive_signal[i];
+  if (this_id >= 7) 
+  	// return; // DONT CHANGE SPN
+    receive_signal = read_file("..\\log\\GA_GENE_COMPETE.txt");
+
+	// cerr << "THIS ID " << this_id << '\n';
+	// cerr << " pass_param " << pass_param.size() << '\n';
+	// for (auto i : pass_param) cerr << i << ' ';
+	// 	cerr << '\n';
+	// cerr << " chase_param " << chase_param.size() << '\n';
+	// for (auto i : chase_param) cerr << i << ' ';
+	// 	cerr << '\n';
+  int base_size = pass_param.size() + chase_param.size();
+  if (receive_signal.size() <= base_size) return;
+  	// cerr << "BASE SIZE " << base_size << ' ' << receive_signal.size() << ' ' << receive_signal[9] << ' ' << receive_signal[10] << '\n';
+  // for (auto i =  base_size; i < base_size + int(pass_strategy_param.size()); i++)
+	  // pass_strategy_param[i - base_size] = receive_signal[i ];
+  		// cerr << " pass strat param " << pass_strategy_param[i - base_size] << ' ';
+  pass_strategy_param[0] = receive_signal[9] - 10;
+  pass_strategy_param[1] = receive_signal[10] - 5;
+  // cerr << " shoot start param " << receive_signal[11] - 20 << ' ' << receive_signal[12] - 10 << '\n';
+  THRESHOLD_SHOOT_RISK -= (receive_signal[11] - 20);
+  THRESHOLD_SHOOT_REWARD -= (receive_signal[12] - 10);
+
   // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
 }
 

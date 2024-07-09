@@ -498,12 +498,15 @@ struct Town{
 
 
 	void town_sort(){
-		for (auto& vill: village){
-			vill.fitness_get();
-			vill.fitness_sort();
-		}
-	
+		for (std::vector<int>::size_type jid = 0; jid < village.size(); jid++)
+			village[jid].fitness_sort();
 
+	}
+
+	void village_sort(){
+		sort(village.begin(), village.end(), [](Village l_g, Village r_g) {
+    		return l_g.cell[0].first > r_g.cell[0].first;
+		});
 	}
 
 	void town_gen(bool suppress = 0){
@@ -599,8 +602,8 @@ struct Town{
 
 			// cout << " THIS TOWN COUNTER " << (diversity_counter * 10 > max_limit) << ' ' << (fitness_counter * 10 > max_limit) << '\n';
 
-		if (diversity_counter * 3 > max_limit) return true;
-		if (fitness_counter * 3 > max_limit) return true;
+		if (diversity_counter * 2 > max_limit) return true;
+		if (fitness_counter * 2 > max_limit) return true;
 
 		return false;
 	}

@@ -47,7 +47,7 @@ std::string get_pre_set(bool X = 0){
   // else if (num_robot == 10) pre_set = "B_";
   // else if (num_robot == ROBOTS) pre_set = "C_";
   // else assert(false);
-  pre_set =  std::to_string(num_robot) + "v" + std::to_string(num_robot) + "_";
+  pre_set =  std::to_string(num_robot/2) + "v" + std::to_string(num_robot/2) + "_";
   if      (CURRENT_BRAIN_LEVEL == 0)  pre_set = pre_set + "L0_";
   else if (CURRENT_BRAIN_LEVEL == 1)  pre_set = pre_set + "L1_";
   else if (CURRENT_BRAIN_LEVEL == 2)  pre_set = pre_set + "L2_";

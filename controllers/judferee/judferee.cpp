@@ -286,11 +286,17 @@ void update_fitness_value(unsigned int time_step_now, int scripted_id){
   else if (scripted_id == 5){
 
 // TESTING
-    if (score[1] > 0 && pass_success[1] >= 1)
-      fitness_return = 6000 + 100 * pass_success[1] + 50 * shoot_attempt[1] + 20 * pass_attempt[1] - wb_robot_get_time();
-    else if (score[1] == 0 && pass_success[1] >= 1)
-      fitness_return = 420 + 100 * pass_success[1] + 50 * shoot_attempt[1] - wb_robot_get_time();
-    else fitness_return = 50;
+
+    fitness_return = 1000 + 1000 * (score[1] > 0) + (300) * (pass_success[1] >= 1) - 20 * wb_robot_get_time();
+
+    // now split into 2 option
+
+    // balance, a bit focus on shoot
+    // fitness_return += 30 * pass_success[1] + 5 * (pass_attempt[1] + shoot_attempt[1]) + 70 * shoot_attempt[1] - 10 * wb_robot_get_time();
+
+    fitness_return += 50 * pass_success[1] + 10 * (pass_attempt[1] + shoot_attempt[1]) + 50 * shoot_attempt[1] - 5 * wb_robot_get_time();
+
+        
   }
 
   // transmit signal
@@ -690,7 +696,11 @@ void little_reroll(){
   }
   else if (SPECIAL_INPUT_DEBUG == 1 || SPECIAL_INPUT_DEBUG == 2 || SPECIAL_INPUT_DEBUG >= 4) {
 
-      double fix_rad = read_file("..\\log\\GA_ENV.txt")[0];
+      vector<double> temp = read_file("..\\log\\GA_ENV.txt");
+
+      double fix_rad = 0;
+      if (temp.size() > 0) fix_rad = temp[0];
+
       fix_rad = read_file("..\\log\\GA_BASE_ENV.txt")[fix_rad];
 
       for (int i = 0; i < ROBOTS; i++) if (!missing_player[i]){
@@ -702,11 +712,10 @@ void little_reroll(){
         std::mt19937 rng(dev());
         std::uniform_int_distribution<std::mt19937::result_type> dist36(0, 35); // distribution in range [1, 6]
 
-
         int rand_choice = dist36(rng);
         // Point new_pose = bound_p( Point{player_position[i][0] + fix_rad * cos(  i*STEP_ANG *  M_PI / 180.0 ),  player_position[i][1] + fix_rad * sin(  i*STEP_ANG *  M_PI / 180.0 )}, 0.4);
 
-        Point new_pose = bound_p( Point{0 + fix_rad * cos(  rand_choice*STEP_ANG *  M_PI / 180.0 ),  0 + fix_rad * sin(  rand_choice*STEP_ANG *  M_PI / 180.0 )}, 0.4);
+        Point new_pose = bound_p( Point{player_initial_position[i][0] + fix_rad * cos(  rand_choice*STEP_ANG *  M_PI / 180.0 ),  player_initial_position[i][1] + fix_rad * sin(  rand_choice*STEP_ANG *  M_PI / 180.0 )}, 0.4);
 
         player_initial_position[i][0] = new_pose.first;
         player_initial_position[i][1] = new_pose.second;

@@ -18,6 +18,13 @@ void clear_file(string file_name){
   ofs.close();
 }
 
+void reset_era_file(string file_name){
+  std::ofstream ofs;
+  ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+  ofs << 0 << '\n';
+  ofs.close();
+}
+
 vector<double> read_file(string file_name){
     std::ifstream ifile(file_name, std::ios::in);
     std::vector<double> return_double;

@@ -512,6 +512,9 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
   log_to_file("..\\live_history\\event_log.txt", "DONE OLD MEMORY --------------------\n");
 
 
+  clear_file("..\\log\\GA_ENV.txt");
+  log_to_file("..\\log\\GA_ENV.txt", std::to_string(this_era) + '\n');
+
   if (ghost.village.size() == 0){
     // INITIAL, would be a function
 
@@ -529,10 +532,6 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
   //   // import this genome as the last survivor
   // }
 
-  int env_count = 0;
-  // clear_file("..\\log\\GA_ENV.txt");
-  // log_to_file("..\\log\\GA_ENV.txt", 0);
-
     cerr << " NOW PROCESSING ERA " << ghost.num_generation << '\n';
 
   while (this_era < num_era){
@@ -544,16 +543,18 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
       live_filling_value(ghost, history_counter, this_era);
       history_counter = -1;
       ghost.town_sort();
+      ghost.village_sort();
 
-      if (ghost.terminate_ok(num_gen_run)) break;
       // cout << " COUNTER " << ghost.diversity_counter + ghost.fitness_counter  << '\n';
       // if (ghost.diversity_counter + ghost.fitness_counter > 0) 
       // std::cout << "Gen " << ghost.num_generation << " has best " << ghost.town_fitness_best_gen() << " with Div " << ghost.town_diversity_get() << " VILLAGER LEADER " << ghost.village[0].cell[0].second  << '\n';
 
       string gen_result = "Gen " + std::to_string(ghost.num_generation) + " FITNESS " + std::to_string(ghost.town_fitness_best_gen()) + " DIVERSITY " + std::to_string(ghost.town_diversity_get()) + "\n";
-      string gen_leader = " VILLAGER_LEADER ";
-      for (auto j = 0; j < (int)ghost.village[0].cell[0].second.adn.size(); j++)
-        gen_leader = gen_leader + std::to_string(ghost.village[0].cell[0].second.adn[j]) + " ";
+
+      int id_max = 0;      
+      string gen_leader = " VILLAGER_LEADER F " + std::to_string(ghost.village[id_max].cell[0].first) + ' ';
+      for (auto j = 0; j < (int)ghost.village[id_max].cell[0].second.adn.size(); j++)
+        gen_leader = gen_leader + std::to_string(ghost.village[id_max].cell[0].second.adn[j]) + " ";
       gen_leader = gen_leader + "\n";
 
       log_to_file("..\\log\\GA_LOG.txt", gen_result);
@@ -564,6 +565,8 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
       log_to_file(era_name, gen_leader);
 
         log_to_file("..\\live_history\\event_log.txt", "GEN " + std::to_string(i) + " complete " + '\n');
+
+      if (ghost.terminate_ok(num_gen_run)) break;
 
         if (i + 1 < num_gen_run) {
           ghost.town_gen(1);
@@ -582,23 +585,20 @@ void GA_RUN(int num_village, int num_gen_run, int num_era){
     log_to_file("..\\log\\GA_LOG_VIP.txt", gen_result);
     log_to_file("..\\log\\GA_LOG_VIP.txt", gen_leader);
 
-    if (RANDOM_RUN){
-      env_count += 1;
-      clear_file("..\\log\\GA_ENV.txt");
-      log_to_file("..\\log\\GA_ENV.txt", std::to_string(env_count));
-    }
-
         log_to_file("..\\live_history\\event_log.txt", " NOW TRANSITING TO NEXT ERA \n" );
 
     ghost.end_of_an_era(ghost.village[0].cell[0], 1);
 
       this_era ++;
-
+    if (RANDOM_RUN){
+      clear_file("..\\log\\GA_ENV.txt");
+      log_to_file("..\\log\\GA_ENV.txt", std::to_string(this_era));
+    }
         log_to_file("..\\live_history\\event_log.txt", " NOW WRITING \n");
 
       history_write_new_era(ghost, this_era, current_checksum);
   }
-  // clear_file("..\\log\\GA_ENV.txt");
+  clear_file("..\\log\\GA_ENV.txt");
   log_to_file("..\\log\\GA_ENV.txt", 0);
 
   cout << "EVAL COUNT " << eval_count << '\n';
@@ -617,12 +617,16 @@ int main(int argc, char **argv){
   target_ub.insert(target_ub.end(), chase_param_ub.begin(), chase_param_ub.end());
   target_ub.insert(target_ub.end(), pass_param_ub.begin(), pass_param_ub.end());
   // target_ub.insert(target_ub.end(), simple_move2ball_param_ub.begin(), simple_move2ball_param_ub.end());
+
   target_ub.insert(target_ub.end(), pass_strategy_param_ub.begin(), pass_strategy_param_ub.end());
+  target_ub.insert(target_ub.end(), shoot_strategy_param_ub.begin(), shoot_strategy_param_ub.end());
 
   target_lb.insert(target_lb.end(), chase_param_lb.begin(), chase_param_lb.end());
   target_lb.insert(target_lb.end(), pass_param_lb.begin(), pass_param_lb.end());
   // target_lb.insert(target_lb.end(), simple_move2ball_param_lb.begin(), simple_move2ball_param_lb.end());
+
   target_lb.insert(target_lb.end(), pass_strategy_param_lb.begin(), pass_strategy_param_lb.end());
+  target_lb.insert(target_lb.end(), shoot_strategy_param_lb.begin(), shoot_strategy_param_lb.end());
 
 
   // ga_emitter = wb_robot_get_device("ga_emitter");

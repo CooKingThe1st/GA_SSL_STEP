@@ -330,20 +330,24 @@ vector<double> read_file(string file_name){
 // IMPORTANT CHANGE HERE
 void update_ga_param(){
 
-  if (ROBOT_TEAM == 0) return; // DONT CHANGE SPN
-
   std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
+
+  if (ROBOT_TEAM == 0) 
+    // return; 
+    receive_signal = read_file("..\\log\\GA_GENE_COMPETE.txt");
+
+  // DONT CHANGE SPN
 
   // for (auto i = 0; i < (int)receive_signal.size(); i++)
   //   simple_move2ball_param[i] = receive_signal[i];
 
+    // cerr << "THIS ID " << robot_decrypt(robot_encrypted_id) << ' ' << receive_signal.size() << '\n';
 
-  for (auto i = 0; i <= 7; i++)
-    if (i <= 4)
+  for (auto i = 0; i < chase_param.size() + pass_param.size(); i++)
+    if (i < chase_param.size())
       chase_param[i] = receive_signal[i];
-    else if (i <= 7)
+    else
       pass_param[i-5] = receive_signal[i];
-
   // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
 }
 

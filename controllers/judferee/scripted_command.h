@@ -74,9 +74,10 @@ bool GYM_TERMINATED_FLAG(unsigned int time_step_now, int script_id){
 		return ((score[0] + score[1]) > 0);
 	} 
 	else if (script_id == 5){
-		if (wb_robot_get_time() > 10) return true;
+		if (wb_robot_get_time() > 13) return true;
 		if (player_ball[11] > 0) return true;
-		
+		if (player_ball[8] > 0) return true;
+
 		return ((score[0] + score[1]) > 0);
 		// return player_ball[4];
 	}

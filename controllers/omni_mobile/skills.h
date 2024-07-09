@@ -2,9 +2,9 @@
 #define SKILLS_H
 
 #ifdef __linux__ 
-  #include "../GA_thread/target_parameter.h"
+  #include "../GA_verDiscrete/target_parameter.h"
 #elif _WIN32
-  #include "..\GA_thread\target_parameter.h"
+  #include "..\GA_verDiscrete\target_parameter.h"
 #else
 
 #endif
@@ -840,7 +840,7 @@ void fixed_self(double delta_w, Point q_goal){
 
 }
 
-		void field_shoot(double x, double y, Dot bx = default_bx, Dot by = default_by, double K1 = pass_param[1], double K2 = pass_param[2])
+		void field_shoot(double x, double y, Dot bx = default_bx, Dot by = default_by, double K1 = pass_param[1], double K2 = pass_param[2], double K3 = pass_param[3])
 		{
 
 		  if (wb_connector_get_presence(magnetic_sensor) == 0){
@@ -859,7 +859,7 @@ void fixed_self(double delta_w, Point q_goal){
 		    else 
 	    	if (distance_query < 6) distance_query *= K2;
 		    else 
-			if (distance_query < 13) distance_query *= 1.2;
+			if (distance_query < 13) distance_query *= K3;
 		    else distance_query *= 1.2;
 
 		    double error_angle = F_dynamic_error(distance_query);
