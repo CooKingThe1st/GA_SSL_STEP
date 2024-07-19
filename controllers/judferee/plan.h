@@ -12,15 +12,6 @@
 #include <filesystem>
 
 #ifdef __linux__ 
-	#include "../omni_mobile/geometry.h"
-#elif _WIN32
-	#include "..\omni_mobile\geometry.h"
-#else
-
-#endif
-
-
-#ifdef __linux__ 
   #include "../GA_verDiscrete/target_parameter.h"
 #elif _WIN32
   #include "..\\GA_verDiscrete\target_parameter.h"
@@ -60,6 +51,10 @@ double THRESHOLD_RISK = 100;
 int THRESHOLD_NUM_RISK = 3;
 double THRESHOLD_SHOOT_RISK = 70;
 double THRESHOLD_SHOOT_REWARD = 20;
+double ori_THRESHOLD_SHOOT_RISK = 70;
+double ori_THRESHOLD_SHOOT_REWARD = 20;
+
+
 double THRESHOLD_SHOOT_DIST = HIGH_BOUND_Y*0.6;
 
 
@@ -621,7 +616,8 @@ struct TackleTree{
 
 #define K_PSEUDO_REWARD 5 // reward from -0.5 -> 4.5 so -2.5 -> 22.5 on risk
 #define K_SHOOT_REWARD 0.8
-#define THRESHOLD_ME_PASS_RISK 80
+double ori_THRESHOLD_ME_PASS_RISK = 80;
+double THRESHOLD_ME_PASS_RISK = 80;
 #define THRESHOLD_ME_PASS_REWARD 110
 #define MINIMUM_REACTION_TIME 1.5
 #define THRESHOLD_MINIMUM_PASS_DIST (MINIMUM_REACTION_TIME*V_BALL*2) //(HALF_LENGTH_LEG*2)*6
@@ -1132,6 +1128,8 @@ Command_Pack switch_to_attack(unsigned int time_step_now,  bool *missing, double
 
 	if (ATTACK_DEBUG_MODE && this_id == ball_holder){ cout << " BALL HOLDER CHECK SHOOT chance " << shoot_risk.first << " reward " << shoot_reward << " id " << shoot_risk.second.second << " goal rew " << get_goal_distance_reward(ball_holder, ball_point) << '\n'; }
 
+		// cerr << " BALL HOLDER CHECK SHOOT chance " << shoot_risk.first << " reward " << shoot_reward << " id " << shoot_risk.second.second << " goal rew " << shoot_reward << '\n';
+		// cerr << "     COMPARE " << THRESHOLD_SHOOT_REWARD << ' ' << THRESHOLD_SHOOT_RISK << '\n';
 	if (shoot_risk.first > 0 && shoot_reward > THRESHOLD_SHOOT_REWARD) {
 		if (this_id == ball_holder) {
 			// if (BALL_HOLDER_IN_STUCK) return Command_Pack{this_id, 6, 2, -1000};
@@ -1569,7 +1567,7 @@ void update_ga_param(int this_id){
 
   std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
 
-  if (this_id >= 7) 
+  if ( (SPECIAL_INPUT_DEBUG == 5 && this_id >= 7) or (SPECIAL_INPUT_DEBUG == 6 && this_id < 7)  )
   	// return; // DONT CHANGE SPN
     receive_signal = read_file("..\\log\\GA_GENE_COMPETE.txt");
 
@@ -1582,15 +1580,16 @@ void update_ga_param(int this_id){
 	// 	cerr << '\n';
   int base_size = pass_param.size() + chase_param.size();
   if (receive_signal.size() <= base_size) return;
-  	// cerr << "BASE SIZE " << base_size << ' ' << receive_signal.size() << ' ' << receive_signal[9] << ' ' << receive_signal[10] << '\n';
+  	// cerr << "BASE SIZE " << base_size << ' ' << receive_signal.size() << ' ' << receive_signal[9] - 10 << ' ' << receive_signal[10] - 5 << '\n';
   // for (auto i =  base_size; i < base_size + int(pass_strategy_param.size()); i++)
 	  // pass_strategy_param[i - base_size] = receive_signal[i ];
   		// cerr << " pass strat param " << pass_strategy_param[i - base_size] << ' ';
   pass_strategy_param[0] = receive_signal[9] - 10;
   pass_strategy_param[1] = receive_signal[10] - 5;
-  // cerr << " shoot start param " << receive_signal[11] - 20 << ' ' << receive_signal[12] - 10 << '\n';
-  THRESHOLD_SHOOT_RISK -= (receive_signal[11] - 20);
-  THRESHOLD_SHOOT_REWARD -= (receive_signal[12] - 10);
+  THRESHOLD_ME_PASS_RISK = ori_THRESHOLD_ME_PASS_RISK + (receive_signal[11] - 20);
+  	// cerr << " shoot start param " << receive_signal[11] - 20 << ' ' << receive_signal[12] - 10 << '\n';
+  THRESHOLD_SHOOT_RISK = ori_THRESHOLD_SHOOT_RISK - (receive_signal[12] - 20);
+  THRESHOLD_SHOOT_REWARD = ori_THRESHOLD_SHOOT_REWARD - (receive_signal[13] - 10);
 
   // cout << simple_move2ball_param[0] << "  check " << simple_move2ball_param[1] << " update gene to param \n";
 }

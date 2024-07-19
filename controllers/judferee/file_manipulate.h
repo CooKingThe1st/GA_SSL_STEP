@@ -2,7 +2,6 @@
 #define FILE_MANI_H
 
 #include <VARIABLE.h>
-#define LOG_MODE 0
 
 
 void log_to_file(string record_file_name, string data)

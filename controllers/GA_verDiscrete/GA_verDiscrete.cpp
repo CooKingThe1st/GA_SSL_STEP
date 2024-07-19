@@ -17,6 +17,8 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
+#define FITNESS_MULTIPLE_MEAN 1
+
 
 #define mems(a, x) memset((a), (x), sizeof(a))
 
@@ -29,8 +31,7 @@ Genome background_color;
 int eval_count = 0;
 double TIME_STEP;
 
-
-double fitness_function(Genome gene){
+double fitness_function_single(Genome gene){
   eval_count += 1;
   // marked4func = 0;
   // send signal to judferee
@@ -110,6 +111,22 @@ double fitness_function(Genome gene){
 
   return fitness_return;
 }
+
+
+double fitness_function(Genome gene){
+  vector<double> multiple_run;
+  double sum_fitness = 0;
+  int limit = 1;
+  if (FITNESS_MULTIPLE_MEAN) limit = 6;
+
+  while (multiple_run.size() < limit)
+  {
+    multiple_run.push_back(fitness_function_single(gene));
+    sum_fitness += multiple_run.back();
+  }
+  return sum_fitness / multiple_run.size();
+}
+
 
 // double fitness_function(Genome gene){
 //  eval_count += 1;

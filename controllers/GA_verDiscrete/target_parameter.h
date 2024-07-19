@@ -50,11 +50,11 @@ vector<double > pass_param_lb{0.3,  0.5,  0.5,   0.3};
 
 
 vector<double > pass_strategy_param
-						// {1.204138,2.979699};
-						// {11.348648,5.045196};
-						{ 10, 5};
-vector<double > pass_strategy_param_ub{30, 30};
-vector<double > pass_strategy_param_lb{0, 0};
+						// {1.204138,2.979699, ?};
+						// {11.348648,5.045196, ?};
+						{ 10, 5, 20};
+vector<double > pass_strategy_param_ub{30, 30, 35};
+vector<double > pass_strategy_param_lb{0, 0, 0};
 
 
 

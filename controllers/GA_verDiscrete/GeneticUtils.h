@@ -595,15 +595,15 @@ struct Town{
 
 		double this_gen_fitness = town_fitness_best_gen();
 		// if  ( fabs(this_gen_fitness - last_gen_fitness) * 50 < fabs(last_gen_fitness)) 
-		if  ( fabs(this_gen_fitness - last_gen_fitness) < 1)
+		if  ( fabs(this_gen_fitness - last_gen_fitness) < total_pop / 2 * total_pop * 5 / 100) // 5% outsider gen, with outsider gen diff > 1
 			fitness_counter+=1;
 		else fitness_counter = 0;
 		last_gen_fitness = this_gen_fitness;
 
 			// cout << " THIS TOWN COUNTER " << (diversity_counter * 10 > max_limit) << ' ' << (fitness_counter * 10 > max_limit) << '\n';
 
-		if (diversity_counter * 2 > max_limit) return true;
-		if (fitness_counter * 2 > max_limit) return true;
+		if (diversity_counter * 3 > max_limit) return true;
+		if (fitness_counter * 2 > 5) return true;
 
 		return false;
 	}

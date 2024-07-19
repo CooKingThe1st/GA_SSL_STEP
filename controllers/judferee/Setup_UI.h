@@ -202,7 +202,7 @@ void set_visibility(){
 
 void fix_viewpoint(){
   // WbNodeRef vpoint = wb_supervisor_node_get_from_def("VPOINT");
-  double default_upper[3] = {0, 0, 30}; // 0, 0, 39
+  double default_upper[3] = {0, 0, 35}; // 0, 0, 39
   double default_top_view[4] = {-0.57735, 0.57735, 0.57735, 2.09432};
 
   // wb_supervisor_node_move_viewpoint(wb_supervisor_node_get_from_def("SOCCER_FIELD"));

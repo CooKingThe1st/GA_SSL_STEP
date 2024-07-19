@@ -5,25 +5,5 @@ IMPORT OLD MEMORY --------------------
  module pass --------------------
  header pass --------------------
  module pass --------------------
- header pass --------------------
- module pass --------------------
 DONE OLD MEMORY --------------------
-FILLING FITNESS -------------------- of gen 2
-GEN 2 complete 
-FILLING FITNESS -------------------- of gen 3
-GEN 3 complete 
-FILLING FITNESS -------------------- of gen 4
-GEN 4 complete 
-FILLING FITNESS -------------------- of gen 5
-GEN 5 complete 
-FILLING FITNESS -------------------- of gen 6
-GEN 6 complete 
-FILLING FITNESS -------------------- of gen 7
-GEN 7 complete 
-FILLING FITNESS -------------------- of gen 8
-GEN 8 complete 
-FILLING FITNESS -------------------- of gen 9
-GEN 9 complete 
- NOW TRANSITING TO NEXT ERA 
- NOW WRITING 
-FILLING FITNESS -------------------- of gen 0
+FILLING FITNESS -------------------- of gen 1

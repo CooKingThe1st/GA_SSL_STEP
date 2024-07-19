@@ -286,17 +286,27 @@ void update_fitness_value(unsigned int time_step_now, int scripted_id){
   else if (scripted_id == 5){
 
 // TESTING
+    int train_id = 1;
 
-    fitness_return = 1000 + 1000 * (score[1] > 0) + (300) * (pass_success[1] >= 1) - 20 * wb_robot_get_time();
+    // 2 version, control ball
+    // fitness_return = 1000 + 300 * (score[train_id] - score[1 - train_id]) + (300) * (pass_success[train_id] >= 1) - 20 * wb_robot_get_time();
+    // fitness_return += 50 * pass_success[train_id] + 5 * (pass_attempt[train_id] + shoot_attempt[train_id]) + 45 * shoot_attempt[train_id];
 
-    // now split into 2 option
+    //            shoot more
+    fitness_return = 1000 + 400 * (score[train_id] - score[1 - train_id]) + (100) * (pass_success[train_id] >= 1) - 20 * wb_robot_get_time();
+    fitness_return += 30 * pass_success[train_id] + 5 * (pass_attempt[train_id] + shoot_attempt[train_id]) + 45 * shoot_attempt[train_id];
 
-    // balance, a bit focus on shoot
-    // fitness_return += 30 * pass_success[1] + 5 * (pass_attempt[1] + shoot_attempt[1]) + 70 * shoot_attempt[1] - 10 * wb_robot_get_time();
+  }
+  else if (scripted_id == 6){
 
-    fitness_return += 50 * pass_success[1] + 10 * (pass_attempt[1] + shoot_attempt[1]) + 50 * shoot_attempt[1] - 5 * wb_robot_get_time();
+    int train_id = 0;
 
-        
+    // fitness_return = 1000 + 300 * (score[train_id] - score[1 - train_id]) + (300) * (pass_success[train_id] >= 1) - 20 * wb_robot_get_time();
+    // fitness_return += 50 * pass_success[train_id] + 5 * (pass_attempt[train_id] + shoot_attempt[train_id]) + 45 * shoot_attempt[train_id];
+
+    fitness_return = 1000 + 400 * (score[train_id] - score[1 - train_id]) + (100) * (pass_success[train_id] >= 1) - 20 * wb_robot_get_time();
+    fitness_return += 30 * pass_success[train_id] + 5 * (pass_attempt[train_id] + shoot_attempt[train_id]) + 45 * shoot_attempt[train_id];
+
   }
 
   // transmit signal
@@ -678,10 +688,27 @@ void get_initial_pose()
     ball_initial_position[j] = ball_position[j];
 }
 
+double random_in_range(pair<double, double> _range_, double ratio){
+  double base = MIN(_range_.first, _range_.second);
+  double range = MAX(_range_.first, _range_.second) - base;
+
+  return base + range * ratio / 100;
+}
+
 void little_reroll(){
   if (!RANDOM_MODE) return;
+  srand(time(0));
 
-  if (SPECIAL_INPUT_DEBUG == 3 || SPECIAL_INPUT_DEBUG == 0){
+  int rand_type = 0;
+
+  if (SPECIAL_INPUT_DEBUG == 3 || SPECIAL_INPUT_DEBUG == 0) rand_type = 1;
+  if (SPECIAL_INPUT_DEBUG == 1 || SPECIAL_INPUT_DEBUG == 2 || SPECIAL_INPUT_DEBUG >= 4) rand_type = 2;
+
+  if (SPECIAL_INPUT_DEBUG == 0 || SPECIAL_INPUT_DEBUG == 5 || SPECIAL_INPUT_DEBUG == 6) rand_type = 1 + rand() % 2;
+
+  rand_type = 3;
+
+  if (rand_type == 1) {
 
     for (int i = 0; i < ROBOTS; i++){
       if (missing_player[i]) continue;
@@ -694,7 +721,7 @@ void little_reroll(){
       wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
     }
   }
-  else if (SPECIAL_INPUT_DEBUG == 1 || SPECIAL_INPUT_DEBUG == 2 || SPECIAL_INPUT_DEBUG >= 4) {
+  else if (rand_type == 2) {
 
       vector<double> temp = read_file("..\\log\\GA_ENV.txt");
 
@@ -724,7 +751,23 @@ void little_reroll(){
         break;
       }
   }
+  else if (rand_type == 3) {
 
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist100(0, 100); // distribution in range [1, 6]
+
+    for (int i = 0; i < ROBOTS; i++){
+      if (missing_player[i]) continue;
+
+
+      Point new_pose = bound_p(Point{random_in_range(bound_X_zone[i], dist100(rng)), random_in_range(bound_Y_zone[i], dist100(rng))}, 0.4);
+      player_initial_position[i][0] = new_pose.first;
+      player_initial_position[i][1] = new_pose.second;
+      wb_supervisor_field_set_sf_vec3f(wb_supervisor_node_get_field(player_def[i], "translation"), player_initial_position[i]);
+    }
+
+  }
 }
 
 void process_sysvar(int argc, char **argv){

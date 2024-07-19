@@ -332,7 +332,8 @@ void update_ga_param(){
 
   std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
 
-  if (ROBOT_TEAM == 0) 
+  // if (ROBOT_TEAM > 0)
+  if (ROBOT_TEAM == 0)
     // return; 
     receive_signal = read_file("..\\log\\GA_GENE_COMPETE.txt");
 
@@ -341,7 +342,7 @@ void update_ga_param(){
   // for (auto i = 0; i < (int)receive_signal.size(); i++)
   //   simple_move2ball_param[i] = receive_signal[i];
 
-    // cerr << "THIS ID " << robot_decrypt(robot_encrypted_id) << ' ' << receive_signal.size() << '\n';
+  // cerr << "THIS ID " << robot_decrypt(robot_encrypted_id) << ' ' << receive_signal.size() << '\n';
 
   for (auto i = 0; i < chase_param.size() + pass_param.size(); i++)
     if (i < chase_param.size())

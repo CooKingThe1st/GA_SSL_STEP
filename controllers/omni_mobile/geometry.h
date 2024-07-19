@@ -58,6 +58,11 @@ int get_team(int player_id){ return (player_id < 7) ? -1 : 1;}
 #define HIGH_BOUND_X 11.55 // org 13.25
 #define HIGH_BOUND_Y 8 // org 8.83
 
+
+#define SOFT_BOUND_X 10.55 // org 13.25
+#define SOFT_BOUND_Y 7 // org 8.83
+
+
 bool on_border(Point val, double border){ 
   if (fabs(val.first) > HIGH_BOUND_X - border) return false;
   if (fabs(val.second) > HIGH_BOUND_Y - border) return false;

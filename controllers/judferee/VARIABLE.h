@@ -10,6 +10,14 @@
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 
+#ifdef __linux__ 
+	#include "../omni_mobile/geometry.h"
+#elif _WIN32
+	#include "..\omni_mobile\geometry.h"
+#else
+
+#endif
+
 
 // SYSTEM ARG
 
@@ -17,6 +25,8 @@ bool MANUAL_MODE = 1;
 bool CHRONO_MODE = 0;
 bool RANDOM_MODE = 0;
 int SPECIAL_INPUT_DEBUG = 0;
+
+bool LOG_MODE = 1;
 
 // GA ARG
 int GA_SIGNAL_TEST = 0;
@@ -77,6 +87,14 @@ int map_id[12] = {-1, 0, 1, -1, 3, 2, -1, -1, -1, 4, 5, 6};
 inline int robot_decrypt(int en_id) { return (en_id >= 500) ? map_id[en_id - 500] : (map_id[en_id] + 7); }
 
 bool missing_player[ROBOTS] = {0};
+
+
+// PLAYER ZONE -> for randomize
+std::pair<double, double> bound_Y_zone[ROBOTS] = {make_pair(-SOFT_BOUND_Y, SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y*1/3), make_pair(-SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y*1/3), make_pair(-SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, SOFT_BOUND_Y),
+												 make_pair(-SOFT_BOUND_Y, SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y*1/3), make_pair(-SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y*1/3), make_pair(-SOFT_BOUND_Y*1/3, -SOFT_BOUND_Y), make_pair(SOFT_BOUND_Y*1/3, SOFT_BOUND_Y)};
+
+std::pair<double, double> bound_X_zone[ROBOTS] = {make_pair(SOFT_BOUND_X, SOFT_BOUND_X*0.8), make_pair(SOFT_BOUND_X*0.4, SOFT_BOUND_X*0.8), make_pair(SOFT_BOUND_X*0.4, SOFT_BOUND_X*0.8), make_pair(SOFT_BOUND_X*0.4, SOFT_BOUND_X*0.8), make_pair(SOFT_BOUND_X*0.4, SOFT_BOUND_X*0), make_pair(SOFT_BOUND_X*0.4, SOFT_BOUND_X*0), make_pair(SOFT_BOUND_X*0.4, SOFT_BOUND_X*0),
+											 make_pair(-SOFT_BOUND_X, -SOFT_BOUND_X*0.8), make_pair(-SOFT_BOUND_X*0.4, -SOFT_BOUND_X*0.8), make_pair(-SOFT_BOUND_X*0.4, -SOFT_BOUND_X*0.8), make_pair(-SOFT_BOUND_X*0.4, -SOFT_BOUND_X*0.8), make_pair(-SOFT_BOUND_X*0.4, -SOFT_BOUND_X*0), make_pair(-SOFT_BOUND_X*0.4, -SOFT_BOUND_X*0), make_pair(-SOFT_BOUND_X*0.4, -SOFT_BOUND_X*0)};
 
 
 // PLAYER COMMAND

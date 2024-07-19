@@ -252,7 +252,9 @@ void finalize_speed(){
     // }
     
   // double temp_sum_w = 0; 
-  auto temp_sum_2D = make_pair(0, 0);
+// auto temp_sum_2D = make_pair(0, 0);
+  pair<double, double> temp_sum_2D = make_pair(0, 0);
+
   targetSpeed[2] = 0;
   for (int i = 0; i < NUM_COMPO_VEC; i++){
     temp_sum_2D.first  += component_vector[i].vx;
@@ -276,6 +278,7 @@ void finalize_speed(){
   else if (NAVI_MAX_METHOD){
      targetSpeed[2] = bound_x(targetSpeed[2], -Wmax, Wmax);
 
+     // cout << temp_sum_2D.first << ' ' << temp_sum_2D.second << ' ' << Vmax << '\n';
     if (length_vector(temp_sum_2D.first, temp_sum_2D.second) >= Vmax)
     {
       double temp_len = length_vector(temp_sum_2D.first, temp_sum_2D.second);

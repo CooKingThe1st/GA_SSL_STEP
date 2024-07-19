@@ -44,7 +44,7 @@ Command_Pack GYM_SCRIPTED_COMMAND(unsigned int time_step_now, int player_ask_id,
 	        }
 
         }
-        else if (script_id == 3 || script_id == 5){
+        else if (script_id == 3 || script_id == 5 || script_id == 6){
         	return_command = origin_command;
         }
 
@@ -74,9 +74,16 @@ bool GYM_TERMINATED_FLAG(unsigned int time_step_now, int script_id){
 		return ((score[0] + score[1]) > 0);
 	} 
 	else if (script_id == 5){
-		if (wb_robot_get_time() > 13) return true;
-		if (player_ball[11] > 0) return true;
-		if (player_ball[8] > 0) return true;
+		if (wb_robot_get_time() > 30) return true;
+
+		// for (int j = 7; j < 14; j++)
+		// 	if (player_ball[j] > 0) return true;
+
+		return ((score[0] + score[1]) > 0);
+		// return player_ball[4];
+	}
+	else if (script_id == 6){
+		if (wb_robot_get_time() > 30) return true;
 
 		return ((score[0] + score[1]) > 0);
 		// return player_ball[4];
