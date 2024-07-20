@@ -1,0 +1,16 @@
+GAME_START
+GAME_START
+Start_of_a_Pass from 4 
+A_good_pass_to 0
+Start_of_a_Pass from 0 
+Switch_Possesion from 0 to 8
+Start_of_a_Pass from 8 
+A_good_pass_to 11
+Start_of_a_Pass from 11 
+A_good_pass_to 7
+Start_of_a_Pass from 7 
+Switch_Possesion from 7 to 1
+Start_of_a_Pass from 1 
+Switch_Possesion from 1 to 7
+Switch_Possesion from 7 to 1
+Start_of_a_Shoot from 1 
