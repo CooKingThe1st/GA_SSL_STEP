@@ -635,15 +635,15 @@ int main(int argc, char **argv){
   target_ub.insert(target_ub.end(), pass_param_ub.begin(), pass_param_ub.end());
   // target_ub.insert(target_ub.end(), simple_move2ball_param_ub.begin(), simple_move2ball_param_ub.end());
 
-  target_ub.insert(target_ub.end(), pass_strategy_param_ub.begin(), pass_strategy_param_ub.end());
-  target_ub.insert(target_ub.end(), shoot_strategy_param_ub.begin(), shoot_strategy_param_ub.end());
+  // target_ub.insert(target_ub.end(), pass_strategy_param_ub.begin(), pass_strategy_param_ub.end());
+  // target_ub.insert(target_ub.end(), shoot_strategy_param_ub.begin(), shoot_strategy_param_ub.end());
 
   target_lb.insert(target_lb.end(), chase_param_lb.begin(), chase_param_lb.end());
   target_lb.insert(target_lb.end(), pass_param_lb.begin(), pass_param_lb.end());
   // target_lb.insert(target_lb.end(), simple_move2ball_param_lb.begin(), simple_move2ball_param_lb.end());
 
-  target_lb.insert(target_lb.end(), pass_strategy_param_lb.begin(), pass_strategy_param_lb.end());
-  target_lb.insert(target_lb.end(), shoot_strategy_param_lb.begin(), shoot_strategy_param_lb.end());
+  // target_lb.insert(target_lb.end(), pass_strategy_param_lb.begin(), pass_strategy_param_lb.end());
+  // target_lb.insert(target_lb.end(), shoot_strategy_param_lb.begin(), shoot_strategy_param_lb.end());
 
 
   // ga_emitter = wb_robot_get_device("ga_emitter");

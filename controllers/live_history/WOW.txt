@@ -53,3 +53,16 @@ Attack genes:
 		  DESC   :   collected after gen 4 of era 3, last to gen 8,  using fitness Shot, get Fitness -> 1178.133333 
 		 *ver K  :   1.653347 2.217901 0.946643 6.262204 1.887725 1.467206 2.154555 4.640399 1.507221 22.583932 25.299484 12.035468 21.188973 3.731715 
 		  DESC   :   collected after gen 9 of era 3, last to gen 9,  using fitness Shot, get Fitness -> 1293.173333
+		  
+Attack Gen: Skill onl genomes
+		 *ver M  :   3.160380 4.475096 1.190722 8.443395 2.240597 1.963426 3.142052 2.137055 1.002317 
+		  DESC   :   collected after gen 8 of era 0, last to gen 9,  using fitness Shot, get Fitness -> 1213.593333 
+		 *ver N  :   3.886505 0.735038 1.190722 7.145554 2.240597 1.963426 3.142052 2.137055 1.133291
+		  DESC   :   collected after gen 3 of era 1, last to gen 9,  using fitness Shot, get Fitness -> 1188.780000
+		 *ver O  :   2.640406 3.849691 2.168110 9.694510 1.926604 1.490074 2.197689 3.987579 1.505790 
+		  DESC   :   collected after gen 3 of era 2, last to gen 6,  using fitness Shot, get Fitness -> 1092.180000 
+		 *ver P  :   2.399765 2.612566 1.364618 8.304295 2.820971 1.169633 1.702902 4.076880 1.575819 
+		  DESC   :   collected after gen 3 of era 1, last to gen 9,  using fitness Shot, get Fitness -> 1135.540000 
+		 *ver R  :   2.399765 2.612566 1.364618 8.304295 2.820971 1.169633 1.702902 2.910539 1.575819
+		  DESC   :   collected after gen 7 of era 1, last to gen 9,  using fitness Shot, get Fitness -> 1194.700000
+		  // 1174.633333 2.399765 2.612566 1.364618 7.566644 2.820971 1.169633 1.702902 2.910539 1.575819 

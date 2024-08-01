@@ -14,3 +14,7 @@ Start_of_a_Pass from 1
 Switch_Possesion from 1 to 7
 Switch_Possesion from 7 to 1
 Start_of_a_Shoot from 1 
+GAME_START
+Start_of_a_Pass from 4 
+GAME_START
+Start_of_a_Pass from 4 

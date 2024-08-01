@@ -3,27 +3,5 @@ IMPORT OLD MEMORY --------------------
  checksum pass --------------------
  header pass --------------------
  module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
- header pass --------------------
- module pass --------------------
 DONE OLD MEMORY --------------------
-FILLING FITNESS -------------------- of gen 9
-GEN 9 complete 
- NOW TRANSITING TO NEXT ERA 
- NOW WRITING 
 FILLING FITNESS -------------------- of gen 0
