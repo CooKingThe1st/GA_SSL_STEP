@@ -24,6 +24,9 @@
 
 #include "scripted_command.h"
 
+
+
+
 #define INFO_MODE 0
 #define DECENTRALIZED 1
 #define DEBUG_MODE 0
@@ -251,7 +254,7 @@ void update_goal()
 int rid = rand() % GRIDIFY_FIELD;
 
 void update_ga_signal(){
-  vector<double> receive_signal = read_file("..\\log\\GA_SIGNAL.txt");
+  vector<double> receive_signal = read_file(ope_system ? "..\\log\\GA_SIGNAL.txt" : "../log/GA_SIGNAL.txt");
   GA_SIGNAL_TEST = int(receive_signal[0]);
 }
 
@@ -312,8 +315,8 @@ void update_fitness_value(unsigned int time_step_now, int scripted_id){
   // transmit signal
     cout << "fitness end " << fitness_return << '\n';
     string return_signal = std::to_string(1) + " " + std::to_string(fitness_return);
-    clear_file("..\\log\\GA_RETURN.txt");
-    log_to_file("..\\log\\GA_RETURN.txt", return_signal);
+    clear_file(ope_system ? "..\\log\\GA_RETURN.txt": ".. /log/GA_RETURN.txt");
+    log_to_file(ope_system ? "..\\log\\GA_RETURN.txt": "../log/GA_RETURN.txt", return_signal);
 
   // int data_send[1] = {9};
   // wb_emitter_send(ga_emitter, data_send, sizeof(int) * 1);
@@ -723,12 +726,12 @@ void little_reroll(){
   }
   else if (rand_type == 2) {
 
-      vector<double> temp = read_file("..\\log\\GA_ENV.txt");
+      vector<double> temp = read_file(ope_system ? "..\\log\\GA_ENV.txt": "../log/GA_ENV.txt");
 
       double fix_rad = 0;
       if (temp.size() > 0) fix_rad = temp[0];
 
-      fix_rad = read_file("..\\log\\GA_BASE_ENV.txt")[fix_rad];
+      fix_rad = read_file(ope_system ? "..\\log\\GA_BASE_ENV.txt": "../log/GA_BASE_ENV.txt")[fix_rad];
 
       for (int i = 0; i < ROBOTS; i++) if (!missing_player[i]){
           // srand(i+time(0));
@@ -802,8 +805,8 @@ void process_sysvar(int argc, char **argv){
 
   string param_concat = std::to_string(CURRENT_BRAIN_LEVEL) + ' ' + std::to_string(RANDOM_MODE) + ' ' + std::to_string(MANUAL_MODE) + ' ' + std::to_string(SPECIAL_INPUT_DEBUG) + '\n';
 
-  clear_file("..\\log\\JUDFEREE_PARAM.txt");
-  log_to_file("..\\log\\JUDFEREE_PARAM.txt", param_concat);
+  clear_file(ope_system ? "..\\log\\JUDFEREE_PARAM.txt": "../log/JUDFEREE_PARAM.txt");
+  log_to_file(ope_system ? "..\\log\\JUDFEREE_PARAM.txt": "../log/JUDFEREE_PARAM.txt", param_concat);
 }
 
 

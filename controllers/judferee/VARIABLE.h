@@ -19,6 +19,14 @@
 #endif
 
 
+#ifdef __linux__ 
+  #define ope_system 0
+#elif _WIN32
+  #define ope_system 1
+#else
+#endif
+
+
 // SYSTEM ARG
 
 bool MANUAL_MODE = 1;

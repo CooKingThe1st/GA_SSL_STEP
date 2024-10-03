@@ -1,0 +1,105 @@
+GAME_START
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+A_good_pass_to 1
+Start_of_a_Shoot from 1 
+A_bad_shot_to 4
+Start_of_a_Shoot from 4 
+TIME _27-08-2024-23-02-53 STEP 392
+Possesion 0.003891 0.996109
+PassAttempt 0 2 Success 0 2
+ShootAttempt 0 2
+BallAtkTime 180.000000 211.000000
+Goal 0 1
+EndOfReport
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+A_good_pass_to 1
+Start_of_a_Shoot from 1 
+A_bad_shot_to 4
+Start_of_a_Shoot from 4 
+TIME _27-08-2024-23-03-54 STEP 402
+Possesion 0.003759 0.996241
+PassAttempt 0 2 Success 0 2
+ShootAttempt 0 2
+BallAtkTime 180.000000 221.000000
+Goal 0 1
+EndOfReport
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+A_good_pass_to 1
+Start_of_a_Shoot from 1 
+A_bad_shot_to 4
+Start_of_a_Shoot from 4 
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+A_good_pass_to 1
+Start_of_a_Shoot from 1 
+A_bad_shot_to 4
+GAME_START
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+A_good_pass_to 1
+Start_of_a_Shoot from 1 
+A_bad_shot_to 4
+Start_of_a_Shoot from 4 
+TIME _27-08-2024-23-06-27 STEP 396
+Possesion 0.003846 0.996154
+PassAttempt 0 2 Success 0 2
+ShootAttempt 0 2
+BallAtkTime 185.000000 210.000000
+Goal 0 1
+EndOfReport
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Start_of_a_Pass from 4 
+A_good_pass_to 1
+Start_of_a_Shoot from 1 
+A_bad_shot_to 4
+Switch_Possesion from 11 to 4
+Start_of_a_Shoot from 4 
+Start_of_a_Shoot from 11 
+Switch_Possesion from 11 to 0
+TIME _27-08-2024-23-06-35 STEP 910
+Possesion 0.137168 0.862832
+PassAttempt 0 2 Success 0 2
+ShootAttempt 1 2
+BallAtkTime 436.000000 473.000000
+Goal 1 0
+EndOfReport
+GAME_START
+Start_of_a_Pass from 1 
+A_good_pass_to 4
+Switch_Possesion from 4 to 11
+Start_of_a_Shoot from 11 
+Switch_Possesion from 11 to 1
+Start_of_a_Pass from 1 
+Switch_Possesion from 1 to 7
+Switch_Possesion from 1 to 7
+Start_of_a_Shoot from 1 
+TIME _27-08-2024-23-06-41 STEP 684
+Possesion 0.279412 0.720588
+PassAttempt 0 2 Success 0 1
+ShootAttempt 1 2
+BallAtkTime 500.000000 183.000000
+Goal 0 1
+EndOfReport
+GAME_START
+Start_of_a_Pass from 1 
+GAME_START
+GAME_START

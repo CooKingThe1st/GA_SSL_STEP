@@ -28,6 +28,14 @@
 #include <string.h>
 #include <unordered_map>
 
+#ifdef __linux__ 
+  #define ope_system 0
+#elif _WIN32
+  #define ope_system 1
+#else
+#endif
+
+
 //-------------PHYSICAL-LIMIT-STAT------
 #define FRICTION 0.2
 //-------------ROBOT-RELATED--------
@@ -330,12 +338,14 @@ vector<double> read_file(string file_name){
 // IMPORTANT CHANGE HERE
 void update_ga_param(){
 
-  std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
+  std::vector <double > receive_signal = read_file( ope_system ? "..\\log\\GA_GENE.txt" : "../log/GA_GENE.txt" );
+
+
 
   // if (ROBOT_TEAM > 0)
   if (ROBOT_TEAM == 0)
     // return; 
-    receive_signal = read_file("..\\log\\GA_GENE_COMPETE.txt");
+    receive_signal = read_file(ope_system ? "..\\log\\GA_GENE_COMPETE.txt" : "../log/GA_GENE_COMPETE.txt");
 
   // DONT CHANGE SPN
 

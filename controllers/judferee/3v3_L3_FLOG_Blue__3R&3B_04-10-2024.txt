@@ -1,0 +1,18 @@
+GAME_START
+Switch_Possesion from 11 to 4
+Switch_Possesion from 11 to 4
+Switch_Possesion from 11 to 4
+Start_of_a_Pass from 11 
+A_good_pass_to 7
+Start_of_a_Pass from 7 
+TIME _04-10-2024-03-45-27 STEP 476
+Possesion 0.785714 0.214286
+PassAttempt 2 0 Success 1 0
+ShootAttempt 0 0
+BallAtkTime 187.000000 288.000000
+Goal 0 1
+EndOfReport
+GAME_START
+Start_of_a_Pass from 4 
+A_good_pass_to 0
+Start_of_a_Pass from 0 

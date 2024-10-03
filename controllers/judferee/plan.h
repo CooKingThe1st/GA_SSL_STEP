@@ -1565,11 +1565,11 @@ Command_Pack guess_ball_strategy( bool *missing, double player_pos[][3], int *pl
 // IMPORTANT CHANGE HERE
 void update_ga_param(int this_id){
 
-  std::vector <double > receive_signal = read_file("..\\log\\GA_GENE.txt");
+  std::vector <double > receive_signal = read_file(ope_system ? "..\\log\\GA_GENE.txt" : "../log/GA_GENE.txt");
 
   if ( (SPECIAL_INPUT_DEBUG == 5 && this_id >= 7) or (SPECIAL_INPUT_DEBUG == 6 && this_id < 7)  )
   	// return; // DONT CHANGE SPN
-    receive_signal = read_file("..\\log\\GA_GENE_COMPETE.txt");
+    receive_signal = read_file(ope_system ? "..\\log\\GA_GENE_COMPETE.txt" : "../log/GA_GENE_COMPETE.txt");
 
 	// cerr << "THIS ID " << this_id << '\n';
 	// cerr << " pass_param " << pass_param.size() << '\n';
