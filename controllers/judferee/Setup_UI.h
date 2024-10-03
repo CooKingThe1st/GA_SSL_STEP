@@ -165,7 +165,32 @@ static void show_command(int *_state, int *ball_state, double *par_main, double 
     string list_command = "";
     for (int i = 0; i < 7; i++){
       if (missing_player[i]) list_command += '\n';
-      else list_command = list_command + robot_name[i] + "   " + decipher_b(_state[i]) +'\n'; //+ " " + double2str(par_main[i]) + " " + double2str(par_sub[i]) + '\n'; 
+      else 
+		if (decipher_b(_state[i]).length() > 3)
+			list_command = list_command + robot_name[i] + "   " + decipher_b(_state[i]) +'\n'; //+ " " + double2str(par_main[i]) + " " + double2str(par_sub[i]) + '\n'; 
+		else {
+			std::string manual_command = " ----MANUAL_";
+			int direction = _state[i] - 224;
+				manual_command += (direction % 2 == 1) ? "U" : "_"; direction /= 2;
+				manual_command += (direction % 2 == 1) ? "D" : "_"; direction /= 2;
+				manual_command += (direction % 2 == 1) ? "L" : "_"; direction /= 2;
+				manual_command += (direction % 2 == 1) ? "R" : "_"; direction /= 2;
+				manual_command += "----";
+			if (int(par_main[i]) == 1) manual_command +=      "Turn-LEFT";
+			else if (int(par_main[i]) == 2) manual_command += "TurnRIGHT";
+			else if (int(par_main[i]) == 8) manual_command += "COOPERATE";
+			else if (int(par_main[i]) == 16) manual_command += "AUTO-----";
+			else  manual_command +=					  "----------";
+				manual_command += 				  "----";
+
+			if (int(par_sub[i]) == 1) manual_command +=      "CHARGING";
+			else manual_command +=      "RELEASE";
+
+
+			// list_command = list_command + robot_name[i] + "   " + decipher_b(_state[i]) + " " + double2str(par_main[i]) + " " + double2str(par_sub[i]) + '\n'; 
+			list_command = list_command + robot_name[i] + "   " + manual_command + '\n'; //decipher_b(_state[i]) + " " + double2str(par_main[i]) + " " + double2str(par_sub[i]) + '\n'; 
+		}
+
     }
     // cout << list_command << '\n';
     wb_supervisor_set_label(37, list_command.c_str(), 0.01, 0.1, 0.072, 0x0000ff, 0.0, "Arial");  // non percent
