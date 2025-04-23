@@ -1,0 +1,11 @@
+GAME_START
+Switch_Possesion from 11 to 4
+Switch_Possesion from 11 to 4
+Switch_Possesion from 4 to 11
+Switch_Possesion from 4 to 11
+Switch_Possesion from 11 to 4
+Start_of_a_Shoot from 4 
+GAME_START
+Start_of_a_Shoot from 11 
+GAME_START
+Start_of_a_Shoot from 4 
